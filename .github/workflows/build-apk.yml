@@ -1,0 +1,50 @@
+name: Build Sami Android APK
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build Signed APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "17"
+          cache: "gradle"
+
+      - name: Ensure Gradle Wrapper Executable
+        run: chmod +x gradlew || true
+
+      - name: Build APK with Gradle
+        run: |
+          ./gradlew assembleDebug --no-daemon --stacktrace || ./gradlew assembleRelease --no-daemon --stacktrace
+
+      - name: Prepare Sami-Android.apk Output
+        run: |
+          mkdir -p output
+          if [ -f "app/build/outputs/apk/debug/app-debug.apk" ]; then
+            cp app/build/outputs/apk/debug/app-debug.apk output/Sami-Android.apk
+          elif [ -f "app/build/outputs/apk/release/app-release-unsigned.apk" ]; then
+            cp app/build/outputs/apk/release/app-release-unsigned.apk output/Sami-Android.apk
+          elif [ -f "app/build/outputs/apk/release/app-release.apk" ]; then
+            cp app/build/outputs/apk/release/app-release.apk output/Sami-Android.apk
+          else
+            find app/build/outputs/apk/ -name "*.apk" -exec cp {} output/Sami-Android.apk \;
+          fi
+          ls -la output/Sami-Android.apk
+
+      - name: Upload Sami-Android.apk Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Sami-Android.apk
+          path: output/Sami-Android.apk
+          if-no-files-found: error
