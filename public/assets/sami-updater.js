@@ -30,6 +30,1015 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
   mod
 ));
 
+// node_modules/react/cjs/react.development.js
+var require_react_development = __commonJS({
+  "node_modules/react/cjs/react.development.js"(exports, module) {
+    "use strict";
+    (function() {
+      function defineDeprecationWarning(methodName, info) {
+        Object.defineProperty(Component.prototype, methodName, {
+          get: function() {
+            console.warn(
+              "%s(...) is deprecated in plain JavaScript React classes. %s",
+              info[0],
+              info[1]
+            );
+          }
+        });
+      }
+      function getIteratorFn(maybeIterable) {
+        if (null === maybeIterable || "object" !== typeof maybeIterable)
+          return null;
+        maybeIterable = MAYBE_ITERATOR_SYMBOL && maybeIterable[MAYBE_ITERATOR_SYMBOL] || maybeIterable["@@iterator"];
+        return "function" === typeof maybeIterable ? maybeIterable : null;
+      }
+      function warnNoop(publicInstance, callerName) {
+        publicInstance = (publicInstance = publicInstance.constructor) && (publicInstance.displayName || publicInstance.name) || "ReactClass";
+        var warningKey = publicInstance + "." + callerName;
+        didWarnStateUpdateForUnmountedComponent[warningKey] || (console.error(
+          "Can't call %s on a component that is not yet mounted. This is a no-op, but it might indicate a bug in your application. Instead, assign to `this.state` directly or define a `state = {};` class property with the desired state in the %s component.",
+          callerName,
+          publicInstance
+        ), didWarnStateUpdateForUnmountedComponent[warningKey] = true);
+      }
+      function Component(props, context, updater) {
+        this.props = props;
+        this.context = context;
+        this.refs = emptyObject;
+        this.updater = updater || ReactNoopUpdateQueue;
+      }
+      function ComponentDummy() {
+      }
+      function PureComponent(props, context, updater) {
+        this.props = props;
+        this.context = context;
+        this.refs = emptyObject;
+        this.updater = updater || ReactNoopUpdateQueue;
+      }
+      function noop() {
+      }
+      function testStringCoercion(value) {
+        return "" + value;
+      }
+      function checkKeyStringCoercion(value) {
+        try {
+          testStringCoercion(value);
+          var JSCompiler_inline_result = false;
+        } catch (e) {
+          JSCompiler_inline_result = true;
+        }
+        if (JSCompiler_inline_result) {
+          JSCompiler_inline_result = console;
+          var JSCompiler_temp_const = JSCompiler_inline_result.error;
+          var JSCompiler_inline_result$jscomp$0 = "function" === typeof Symbol && Symbol.toStringTag && value[Symbol.toStringTag] || value.constructor.name || "Object";
+          JSCompiler_temp_const.call(
+            JSCompiler_inline_result,
+            "The provided key is an unsupported type %s. This value must be coerced to a string before using it here.",
+            JSCompiler_inline_result$jscomp$0
+          );
+          return testStringCoercion(value);
+        }
+      }
+      function getComponentNameFromType(type) {
+        if (null == type) return null;
+        if ("function" === typeof type)
+          return type.$$typeof === REACT_CLIENT_REFERENCE ? null : type.displayName || type.name || null;
+        if ("string" === typeof type) return type;
+        switch (type) {
+          case REACT_FRAGMENT_TYPE:
+            return "Fragment";
+          case REACT_PROFILER_TYPE:
+            return "Profiler";
+          case REACT_STRICT_MODE_TYPE:
+            return "StrictMode";
+          case REACT_SUSPENSE_TYPE:
+            return "Suspense";
+          case REACT_SUSPENSE_LIST_TYPE:
+            return "SuspenseList";
+          case REACT_ACTIVITY_TYPE:
+            return "Activity";
+          case REACT_VIEW_TRANSITION_TYPE:
+            return "ViewTransition";
+        }
+        if ("object" === typeof type)
+          switch ("number" === typeof type.tag && console.error(
+            "Received an unexpected object in getComponentNameFromType(). This is likely a bug in React. Please file an issue."
+          ), type.$$typeof) {
+            case REACT_PORTAL_TYPE:
+              return "Portal";
+            case REACT_CONTEXT_TYPE:
+              return type.displayName || "Context";
+            case REACT_CONSUMER_TYPE:
+              return (type._context.displayName || "Context") + ".Consumer";
+            case REACT_FORWARD_REF_TYPE:
+              var innerType = type.render;
+              type = type.displayName;
+              type || (type = innerType.displayName || innerType.name || "", type = "" !== type ? "ForwardRef(" + type + ")" : "ForwardRef");
+              return type;
+            case REACT_MEMO_TYPE:
+              return innerType = type.displayName || null, null !== innerType ? innerType : getComponentNameFromType(type.type) || "Memo";
+            case REACT_LAZY_TYPE:
+              innerType = type._payload;
+              type = type._init;
+              try {
+                return getComponentNameFromType(type(innerType));
+              } catch (x) {
+              }
+          }
+        return null;
+      }
+      function getTaskName(type) {
+        if (type === REACT_FRAGMENT_TYPE) return "<>";
+        if ("object" === typeof type && null !== type && type.$$typeof === REACT_LAZY_TYPE)
+          return "<...>";
+        try {
+          var name = getComponentNameFromType(type);
+          return name ? "<" + name + ">" : "<...>";
+        } catch (x) {
+          return "<...>";
+        }
+      }
+      function getOwner() {
+        var dispatcher = ReactSharedInternals.A;
+        return null === dispatcher ? null : dispatcher.getOwner();
+      }
+      function UnknownOwner() {
+        return Error("react-stack-top-frame");
+      }
+      function hasValidKey(config) {
+        if (hasOwnProperty.call(config, "key")) {
+          var getter = Object.getOwnPropertyDescriptor(config, "key").get;
+          if (getter && getter.isReactWarning) return false;
+        }
+        return void 0 !== config.key;
+      }
+      function defineKeyPropWarningGetter(props, displayName) {
+        function warnAboutAccessingKey() {
+          specialPropKeyWarningShown || (specialPropKeyWarningShown = true, console.error(
+            "%s: `key` is not a prop. Trying to access it will result in `undefined` being returned. If you need to access the same value within the child component, you should pass it as a different prop. (https://react.dev/link/special-props)",
+            displayName
+          ));
+        }
+        warnAboutAccessingKey.isReactWarning = true;
+        Object.defineProperty(props, "key", {
+          get: warnAboutAccessingKey,
+          configurable: true
+        });
+      }
+      function elementRefGetterWithDeprecationWarning() {
+        var componentName = getComponentNameFromType(this.type);
+        didWarnAboutElementRef[componentName] || (didWarnAboutElementRef[componentName] = true, console.error(
+          "Accessing element.ref was removed in React 19. ref is now a regular prop. It will be removed from the JSX Element type in a future release."
+        ));
+        componentName = this.props.ref;
+        return void 0 !== componentName ? componentName : null;
+      }
+      function ReactElement(type, key, props, owner, debugStack, debugTask) {
+        var refProp = props.ref;
+        type = {
+          $$typeof: REACT_ELEMENT_TYPE,
+          type,
+          key,
+          props,
+          _owner: owner
+        };
+        null !== (void 0 !== refProp ? refProp : null) ? Object.defineProperty(type, "ref", {
+          enumerable: false,
+          get: elementRefGetterWithDeprecationWarning
+        }) : Object.defineProperty(type, "ref", { enumerable: false, value: null });
+        type._store = {};
+        Object.defineProperty(type._store, "validated", {
+          configurable: false,
+          enumerable: false,
+          writable: true,
+          value: 0
+        });
+        Object.defineProperty(type, "_debugInfo", {
+          configurable: false,
+          enumerable: false,
+          writable: true,
+          value: null
+        });
+        Object.defineProperty(type, "_debugStack", {
+          configurable: false,
+          enumerable: false,
+          writable: true,
+          value: debugStack
+        });
+        Object.defineProperty(type, "_debugTask", {
+          configurable: false,
+          enumerable: false,
+          writable: true,
+          value: debugTask
+        });
+        Object.freeze && (Object.freeze(type.props), Object.freeze(type));
+        return type;
+      }
+      function cloneAndReplaceKey(oldElement, newKey) {
+        newKey = ReactElement(
+          oldElement.type,
+          newKey,
+          oldElement.props,
+          oldElement._owner,
+          oldElement._debugStack,
+          oldElement._debugTask
+        );
+        oldElement._store && (newKey._store.validated = oldElement._store.validated);
+        return newKey;
+      }
+      function validateChildKeys(node) {
+        isValidElement(node) ? node._store && (node._store.validated = 1) : "object" === typeof node && null !== node && node.$$typeof === REACT_LAZY_TYPE && ("fulfilled" === node._payload.status ? isValidElement(node._payload.value) && node._payload.value._store && (node._payload.value._store.validated = 1) : node._store && (node._store.validated = 1));
+      }
+      function isValidElement(object) {
+        return "object" === typeof object && null !== object && object.$$typeof === REACT_ELEMENT_TYPE;
+      }
+      function escape(key) {
+        var escaperLookup = { "=": "=0", ":": "=2" };
+        return "$" + key.replace(/[=:]/g, function(match) {
+          return escaperLookup[match];
+        });
+      }
+      function getElementKey(element, index) {
+        return "object" === typeof element && null !== element && null != element.key ? (checkKeyStringCoercion(element.key), escape("" + element.key)) : index.toString(36);
+      }
+      function resolveThenable(thenable) {
+        switch (thenable.status) {
+          case "fulfilled":
+            return thenable.value;
+          case "rejected":
+            throw thenable.reason;
+          default:
+            switch ("string" === typeof thenable.status ? thenable.then(noop, noop) : (thenable.status = "pending", thenable.then(
+              function(fulfilledValue) {
+                "pending" === thenable.status && (thenable.status = "fulfilled", thenable.value = fulfilledValue);
+              },
+              function(error) {
+                "pending" === thenable.status && (thenable.status = "rejected", thenable.reason = error);
+              }
+            )), thenable.status) {
+              case "fulfilled":
+                return thenable.value;
+              case "rejected":
+                throw thenable.reason;
+            }
+        }
+        throw thenable;
+      }
+      function mapIntoArray(children, array, escapedPrefix, nameSoFar, callback) {
+        var type = typeof children;
+        if ("undefined" === type || "boolean" === type) children = null;
+        var invokeCallback = false;
+        if (null === children) invokeCallback = true;
+        else
+          switch (type) {
+            case "bigint":
+            case "string":
+            case "number":
+              invokeCallback = true;
+              break;
+            case "object":
+              switch (children.$$typeof) {
+                case REACT_ELEMENT_TYPE:
+                case REACT_PORTAL_TYPE:
+                  invokeCallback = true;
+                  break;
+                case REACT_LAZY_TYPE:
+                  return invokeCallback = children._init, mapIntoArray(
+                    invokeCallback(children._payload),
+                    array,
+                    escapedPrefix,
+                    nameSoFar,
+                    callback
+                  );
+              }
+          }
+        if (invokeCallback) {
+          invokeCallback = children;
+          callback = callback(invokeCallback);
+          var childKey = "" === nameSoFar ? "." + getElementKey(invokeCallback, 0) : nameSoFar;
+          isArrayImpl(callback) ? (escapedPrefix = "", null != childKey && (escapedPrefix = childKey.replace(userProvidedKeyEscapeRegex, "$&/") + "/"), mapIntoArray(callback, array, escapedPrefix, "", function(c) {
+            return c;
+          })) : null != callback && (isValidElement(callback) && (null != callback.key && (invokeCallback && invokeCallback.key === callback.key || checkKeyStringCoercion(callback.key)), escapedPrefix = cloneAndReplaceKey(
+            callback,
+            escapedPrefix + (null == callback.key || invokeCallback && invokeCallback.key === callback.key ? "" : ("" + callback.key).replace(
+              userProvidedKeyEscapeRegex,
+              "$&/"
+            ) + "/") + childKey
+          ), "" !== nameSoFar && null != invokeCallback && isValidElement(invokeCallback) && null == invokeCallback.key && invokeCallback._store && !invokeCallback._store.validated && (escapedPrefix._store.validated = 2), callback = escapedPrefix), array.push(callback));
+          return 1;
+        }
+        invokeCallback = 0;
+        childKey = "" === nameSoFar ? "." : nameSoFar + ":";
+        if (isArrayImpl(children))
+          for (var i = 0; i < children.length; i++)
+            nameSoFar = children[i], type = childKey + getElementKey(nameSoFar, i), invokeCallback += mapIntoArray(
+              nameSoFar,
+              array,
+              escapedPrefix,
+              type,
+              callback
+            );
+        else if (i = getIteratorFn(children), "function" === typeof i)
+          for (i === children.entries && (didWarnAboutMaps || console.warn(
+            "Using Maps as children is not supported. Use an array of keyed ReactElements instead."
+          ), didWarnAboutMaps = true), children = i.call(children), i = 0; !(nameSoFar = children.next()).done; )
+            nameSoFar = nameSoFar.value, type = childKey + getElementKey(nameSoFar, i++), invokeCallback += mapIntoArray(
+              nameSoFar,
+              array,
+              escapedPrefix,
+              type,
+              callback
+            );
+        else if ("object" === type) {
+          if ("function" === typeof children.then)
+            return mapIntoArray(
+              resolveThenable(children),
+              array,
+              escapedPrefix,
+              nameSoFar,
+              callback
+            );
+          array = String(children);
+          throw Error(
+            "Objects are not valid as a React child (found: " + ("[object Object]" === array ? "object with keys {" + Object.keys(children).join(", ") + "}" : array) + "). If you meant to render a collection of children, use an array instead."
+          );
+        }
+        return invokeCallback;
+      }
+      function mapChildren(children, func, context) {
+        if (null == children) return children;
+        var result = [], count = 0;
+        mapIntoArray(children, result, "", "", function(child) {
+          return func.call(context, child, count++);
+        });
+        return result;
+      }
+      function lazyInitializer(payload) {
+        if (-1 === payload._status) {
+          var resolveDebugValue = null, rejectDebugValue = null, ioInfo = payload._ioInfo;
+          null != ioInfo && (ioInfo.start = ioInfo.end = performance.now(), ioInfo.value = new Promise(function(resolve, reject) {
+            resolveDebugValue = resolve;
+            rejectDebugValue = reject;
+          }));
+          ioInfo = payload._result;
+          var thenable = ioInfo();
+          thenable.then(
+            function(moduleObject) {
+              if (0 === payload._status || -1 === payload._status) {
+                payload._status = 1;
+                payload._result = moduleObject;
+                var _ioInfo = payload._ioInfo;
+                if (null != _ioInfo) {
+                  _ioInfo.end = performance.now();
+                  var debugValue = null == moduleObject ? void 0 : moduleObject.default;
+                  resolveDebugValue(debugValue);
+                  _ioInfo.value.status = "fulfilled";
+                  _ioInfo.value.value = debugValue;
+                }
+                void 0 === thenable.status && (thenable.status = "fulfilled", thenable.value = moduleObject);
+              }
+            },
+            function(error) {
+              if (0 === payload._status || -1 === payload._status) {
+                payload._status = 2;
+                payload._result = error;
+                var _ioInfo2 = payload._ioInfo;
+                null != _ioInfo2 && (_ioInfo2.end = performance.now(), _ioInfo2.value.then(noop, noop), rejectDebugValue(error), _ioInfo2.value.status = "rejected", _ioInfo2.value.reason = error);
+                void 0 === thenable.status && (thenable.status = "rejected", thenable.reason = error);
+              }
+            }
+          );
+          ioInfo = payload._ioInfo;
+          if (null != ioInfo) {
+            var displayName = thenable.displayName;
+            "string" === typeof displayName && (ioInfo.name = displayName);
+          }
+          -1 === payload._status && (payload._status = 0, payload._result = thenable);
+        }
+        if (1 === payload._status)
+          return ioInfo = payload._result, void 0 === ioInfo && console.error(
+            "lazy: Expected the result of a dynamic import() call. Instead received: %s\n\nYour code should look like: \n  const MyComponent = lazy(() => import('./MyComponent'))\n\nDid you accidentally put curly braces around the import?",
+            ioInfo
+          ), "default" in ioInfo || console.error(
+            "lazy: Expected the result of a dynamic import() call. Instead received: %s\n\nYour code should look like: \n  const MyComponent = lazy(() => import('./MyComponent'))",
+            ioInfo
+          ), ioInfo.default;
+        throw payload._result;
+      }
+      function resolveDispatcher() {
+        var dispatcher = ReactSharedInternals.H;
+        null === dispatcher && console.error(
+          "Invalid hook call. Hooks can only be called inside of the body of a function component. This could happen for one of the following reasons:\n1. You might have mismatching versions of React and the renderer (such as React DOM)\n2. You might be breaking the Rules of Hooks\n3. You might have more than one copy of React in the same app\nSee https://react.dev/link/invalid-hook-call for tips about how to debug and fix this problem."
+        );
+        return dispatcher;
+      }
+      function releaseAsyncTransition() {
+        ReactSharedInternals.asyncTransitions--;
+      }
+      function startTransition(scope) {
+        var prevTransition = ReactSharedInternals.T, currentTransition = {};
+        currentTransition.types = null !== prevTransition ? prevTransition.types : null;
+        currentTransition._updatedFibers = /* @__PURE__ */ new Set();
+        ReactSharedInternals.T = currentTransition;
+        try {
+          var returnValue = scope(), onStartTransitionFinish = ReactSharedInternals.S;
+          null !== onStartTransitionFinish && onStartTransitionFinish(currentTransition, returnValue);
+          "object" === typeof returnValue && null !== returnValue && "function" === typeof returnValue.then && (ReactSharedInternals.asyncTransitions++, returnValue.then(releaseAsyncTransition, releaseAsyncTransition), returnValue.then(noop, reportGlobalError));
+        } catch (error) {
+          reportGlobalError(error);
+        } finally {
+          null === prevTransition && currentTransition._updatedFibers && (scope = currentTransition._updatedFibers.size, currentTransition._updatedFibers.clear(), 10 < scope && console.warn(
+            "Detected a large number of updates inside startTransition. If this is due to a subscription please re-write it to use React provided hooks. Otherwise concurrent mode guarantees are off the table."
+          )), null !== prevTransition && null !== currentTransition.types && (null !== prevTransition.types && prevTransition.types !== currentTransition.types && console.error(
+            "We expected inner Transitions to have transferred the outer types set and that you cannot add to the outer Transition while inside the inner.This is a bug in React."
+          ), prevTransition.types = currentTransition.types), ReactSharedInternals.T = prevTransition;
+        }
+      }
+      function addTransitionType(type) {
+        var transition = ReactSharedInternals.T;
+        if (null !== transition) {
+          var transitionTypes = transition.types;
+          null === transitionTypes ? transition.types = [type] : -1 === transitionTypes.indexOf(type) && transitionTypes.push(type);
+        } else
+          0 === ReactSharedInternals.asyncTransitions && console.error(
+            "addTransitionType can only be called inside a `startTransition()` callback. It must be associated with a specific Transition."
+          ), startTransition(addTransitionType.bind(null, type));
+      }
+      function enqueueTask(task) {
+        if (null === enqueueTaskImpl)
+          try {
+            var requireString = ("require" + Math.random()).slice(0, 7);
+            enqueueTaskImpl = (module && module[requireString]).call(
+              module,
+              "timers"
+            ).setImmediate;
+          } catch (_err) {
+            enqueueTaskImpl = function(callback) {
+              false === didWarnAboutMessageChannel && (didWarnAboutMessageChannel = true, "undefined" === typeof MessageChannel && console.error(
+                "This browser does not have a MessageChannel implementation, so enqueuing tasks via await act(async () => ...) will fail. Please file an issue at https://github.com/facebook/react/issues if you encounter this warning."
+              ));
+              var channel = new MessageChannel();
+              channel.port1.onmessage = callback;
+              channel.port2.postMessage(void 0);
+            };
+          }
+        return enqueueTaskImpl(task);
+      }
+      function aggregateErrors(errors) {
+        return 1 < errors.length && "function" === typeof AggregateError ? new AggregateError(errors) : errors[0];
+      }
+      function popActScope(prevActQueue, prevActScopeDepth) {
+        prevActScopeDepth !== actScopeDepth - 1 && console.error(
+          "You seem to have overlapping act() calls, this is not supported. Be sure to await previous act() calls before making a new one. "
+        );
+        actScopeDepth = prevActScopeDepth;
+      }
+      function recursivelyFlushAsyncActWork(returnValue, resolve, reject) {
+        var queue = ReactSharedInternals.actQueue;
+        if (null !== queue)
+          if (0 !== queue.length)
+            try {
+              flushActQueue(queue);
+              enqueueTask(function() {
+                return recursivelyFlushAsyncActWork(returnValue, resolve, reject);
+              });
+              return;
+            } catch (error) {
+              ReactSharedInternals.thrownErrors.push(error);
+            }
+          else ReactSharedInternals.actQueue = null;
+        0 < ReactSharedInternals.thrownErrors.length ? (queue = aggregateErrors(ReactSharedInternals.thrownErrors), ReactSharedInternals.thrownErrors.length = 0, reject(queue)) : resolve(returnValue);
+      }
+      function flushActQueue(queue) {
+        if (!isFlushing) {
+          isFlushing = true;
+          var i = 0;
+          try {
+            for (; i < queue.length; i++) {
+              var callback = queue[i];
+              do {
+                ReactSharedInternals.didUsePromise = false;
+                var continuation = callback(false);
+                if (null !== continuation) {
+                  if (ReactSharedInternals.didUsePromise) {
+                    queue[i] = callback;
+                    queue.splice(0, i);
+                    return;
+                  }
+                  callback = continuation;
+                } else break;
+              } while (1);
+            }
+            queue.length = 0;
+          } catch (error) {
+            queue.splice(0, i + 1), ReactSharedInternals.thrownErrors.push(error);
+          } finally {
+            isFlushing = false;
+          }
+        }
+      }
+      "undefined" !== typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ && "function" === typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart && __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(Error());
+      var REACT_ELEMENT_TYPE = Symbol.for("react.transitional.element"), REACT_PORTAL_TYPE = Symbol.for("react.portal"), REACT_FRAGMENT_TYPE = Symbol.for("react.fragment"), REACT_STRICT_MODE_TYPE = Symbol.for("react.strict_mode"), REACT_PROFILER_TYPE = Symbol.for("react.profiler"), REACT_CONSUMER_TYPE = Symbol.for("react.consumer"), REACT_CONTEXT_TYPE = Symbol.for("react.context"), REACT_FORWARD_REF_TYPE = Symbol.for("react.forward_ref"), REACT_SUSPENSE_TYPE = Symbol.for("react.suspense"), REACT_SUSPENSE_LIST_TYPE = Symbol.for("react.suspense_list"), REACT_MEMO_TYPE = Symbol.for("react.memo"), REACT_LAZY_TYPE = Symbol.for("react.lazy"), REACT_ACTIVITY_TYPE = Symbol.for("react.activity"), REACT_VIEW_TRANSITION_TYPE = Symbol.for("react.view_transition"), MAYBE_ITERATOR_SYMBOL = Symbol.iterator, didWarnStateUpdateForUnmountedComponent = {}, ReactNoopUpdateQueue = {
+        isMounted: function() {
+          return false;
+        },
+        enqueueForceUpdate: function(publicInstance) {
+          warnNoop(publicInstance, "forceUpdate");
+        },
+        enqueueReplaceState: function(publicInstance) {
+          warnNoop(publicInstance, "replaceState");
+        },
+        enqueueSetState: function(publicInstance) {
+          warnNoop(publicInstance, "setState");
+        }
+      }, assign = Object.assign, emptyObject = {};
+      Object.freeze(emptyObject);
+      Component.prototype.isReactComponent = {};
+      Component.prototype.setState = function(partialState, callback) {
+        if ("object" !== typeof partialState && "function" !== typeof partialState && null != partialState)
+          throw Error(
+            "takes an object of state variables to update or a function which returns an object of state variables."
+          );
+        this.updater.enqueueSetState(this, partialState, callback, "setState");
+      };
+      Component.prototype.forceUpdate = function(callback) {
+        this.updater.enqueueForceUpdate(this, callback, "forceUpdate");
+      };
+      var deprecatedAPIs = {
+        isMounted: [
+          "isMounted",
+          "Instead, make sure to clean up subscriptions and pending requests in componentWillUnmount to prevent memory leaks."
+        ],
+        replaceState: [
+          "replaceState",
+          "Refactor your code to use setState instead (see https://github.com/facebook/react/issues/3236)."
+        ]
+      };
+      for (fnName in deprecatedAPIs)
+        deprecatedAPIs.hasOwnProperty(fnName) && defineDeprecationWarning(fnName, deprecatedAPIs[fnName]);
+      ComponentDummy.prototype = Component.prototype;
+      deprecatedAPIs = PureComponent.prototype = new ComponentDummy();
+      deprecatedAPIs.constructor = PureComponent;
+      assign(deprecatedAPIs, Component.prototype);
+      deprecatedAPIs.isPureReactComponent = true;
+      var isArrayImpl = Array.isArray, REACT_CLIENT_REFERENCE = Symbol.for("react.client.reference"), ReactSharedInternals = {
+        H: null,
+        A: null,
+        T: null,
+        S: null,
+        actQueue: null,
+        asyncTransitions: 0,
+        isBatchingLegacy: false,
+        didScheduleLegacyUpdate: false,
+        didUsePromise: false,
+        thrownErrors: [],
+        getCurrentStack: null,
+        recentlyCreatedOwnerStacks: 0
+      }, hasOwnProperty = Object.prototype.hasOwnProperty, createTask = console.createTask ? console.createTask : function() {
+        return null;
+      };
+      deprecatedAPIs = {
+        react_stack_bottom_frame: function(callStackForError) {
+          return callStackForError();
+        }
+      };
+      var specialPropKeyWarningShown, didWarnAboutOldJSXRuntime;
+      var didWarnAboutElementRef = {};
+      var unknownOwnerDebugStack = deprecatedAPIs.react_stack_bottom_frame.bind(
+        deprecatedAPIs,
+        UnknownOwner
+      )();
+      var unknownOwnerDebugTask = createTask(getTaskName(UnknownOwner));
+      var didWarnAboutMaps = false, userProvidedKeyEscapeRegex = /\/+/g, reportGlobalError = "function" === typeof reportError ? reportError : function(error) {
+        if ("object" === typeof window && "function" === typeof window.ErrorEvent) {
+          var event = new window.ErrorEvent("error", {
+            bubbles: true,
+            cancelable: true,
+            message: "object" === typeof error && null !== error && "string" === typeof error.message ? String(error.message) : String(error),
+            error
+          });
+          if (!window.dispatchEvent(event)) return;
+        } else if ("object" === typeof process && "function" === typeof process.emit) {
+          process.emit("uncaughtException", error);
+          return;
+        }
+        console.error(error);
+      }, didWarnAboutMessageChannel = false, enqueueTaskImpl = null, actScopeDepth = 0, didWarnNoAwaitAct = false, isFlushing = false, queueSeveralMicrotasks = "function" === typeof queueMicrotask ? function(callback) {
+        queueMicrotask(function() {
+          return queueMicrotask(callback);
+        });
+      } : enqueueTask;
+      deprecatedAPIs = Object.freeze({
+        __proto__: null,
+        c: function(size) {
+          return resolveDispatcher().useMemoCache(size);
+        }
+      });
+      var fnName = {
+        map: mapChildren,
+        forEach: function(children, forEachFunc, forEachContext) {
+          mapChildren(
+            children,
+            function() {
+              forEachFunc.apply(this, arguments);
+            },
+            forEachContext
+          );
+        },
+        count: function(children) {
+          var n = 0;
+          mapChildren(children, function() {
+            n++;
+          });
+          return n;
+        },
+        toArray: function(children) {
+          return mapChildren(children, function(child) {
+            return child;
+          }) || [];
+        },
+        only: function(children) {
+          if (!isValidElement(children))
+            throw Error(
+              "React.Children.only expected to receive a single React element child."
+            );
+          return children;
+        }
+      };
+      exports.Activity = REACT_ACTIVITY_TYPE;
+      exports.Children = fnName;
+      exports.Component = Component;
+      exports.Fragment = REACT_FRAGMENT_TYPE;
+      exports.Profiler = REACT_PROFILER_TYPE;
+      exports.PureComponent = PureComponent;
+      exports.StrictMode = REACT_STRICT_MODE_TYPE;
+      exports.Suspense = REACT_SUSPENSE_TYPE;
+      exports.ViewTransition = REACT_VIEW_TRANSITION_TYPE;
+      exports.__CLIENT_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE = ReactSharedInternals;
+      exports.__COMPILER_RUNTIME = deprecatedAPIs;
+      exports.act = function(callback) {
+        var prevActQueue = ReactSharedInternals.actQueue, prevActScopeDepth = actScopeDepth;
+        actScopeDepth++;
+        var queue = ReactSharedInternals.actQueue = null !== prevActQueue ? prevActQueue : [], didAwaitActCall = false;
+        try {
+          var result = callback();
+        } catch (error) {
+          ReactSharedInternals.thrownErrors.push(error);
+        }
+        if (0 < ReactSharedInternals.thrownErrors.length)
+          throw popActScope(prevActQueue, prevActScopeDepth), callback = aggregateErrors(ReactSharedInternals.thrownErrors), ReactSharedInternals.thrownErrors.length = 0, callback;
+        if (null !== result && "object" === typeof result && "function" === typeof result.then) {
+          var thenable = result;
+          queueSeveralMicrotasks(function() {
+            didAwaitActCall || didWarnNoAwaitAct || (didWarnNoAwaitAct = true, console.error(
+              "You called act(async () => ...) without await. This could lead to unexpected testing behaviour, interleaving multiple act calls and mixing their scopes. You should - await act(async () => ...);"
+            ));
+          });
+          return {
+            then: function(resolve, reject) {
+              didAwaitActCall = true;
+              thenable.then(
+                function(returnValue) {
+                  popActScope(prevActQueue, prevActScopeDepth);
+                  if (0 === prevActScopeDepth) {
+                    try {
+                      flushActQueue(queue), enqueueTask(function() {
+                        return recursivelyFlushAsyncActWork(
+                          returnValue,
+                          resolve,
+                          reject
+                        );
+                      });
+                    } catch (error$0) {
+                      ReactSharedInternals.thrownErrors.push(error$0);
+                    }
+                    if (0 < ReactSharedInternals.thrownErrors.length) {
+                      var _thrownError = aggregateErrors(
+                        ReactSharedInternals.thrownErrors
+                      );
+                      ReactSharedInternals.thrownErrors.length = 0;
+                      reject(_thrownError);
+                    }
+                  } else resolve(returnValue);
+                },
+                function(error) {
+                  popActScope(prevActQueue, prevActScopeDepth);
+                  0 < ReactSharedInternals.thrownErrors.length ? (error = aggregateErrors(
+                    ReactSharedInternals.thrownErrors
+                  ), ReactSharedInternals.thrownErrors.length = 0, reject(error)) : reject(error);
+                }
+              );
+            }
+          };
+        }
+        var returnValue$jscomp$0 = result;
+        popActScope(prevActQueue, prevActScopeDepth);
+        0 === prevActScopeDepth && (flushActQueue(queue), 0 !== queue.length && queueSeveralMicrotasks(function() {
+          didAwaitActCall || didWarnNoAwaitAct || (didWarnNoAwaitAct = true, console.error(
+            "A component suspended inside an `act` scope, but the `act` call was not awaited. When testing React components that depend on asynchronous data, you must await the result:\n\nawait act(() => ...)"
+          ));
+        }), ReactSharedInternals.actQueue = null);
+        if (0 < ReactSharedInternals.thrownErrors.length)
+          throw callback = aggregateErrors(ReactSharedInternals.thrownErrors), ReactSharedInternals.thrownErrors.length = 0, callback;
+        return {
+          then: function(resolve, reject) {
+            didAwaitActCall = true;
+            0 === prevActScopeDepth ? (ReactSharedInternals.actQueue = queue, enqueueTask(function() {
+              return recursivelyFlushAsyncActWork(
+                returnValue$jscomp$0,
+                resolve,
+                reject
+              );
+            })) : resolve(returnValue$jscomp$0);
+          }
+        };
+      };
+      exports.addTransitionType = addTransitionType;
+      exports.cache = function(fn) {
+        return function() {
+          return fn.apply(null, arguments);
+        };
+      };
+      exports.cacheSignal = function() {
+        return null;
+      };
+      exports.captureOwnerStack = function() {
+        var getCurrentStack = ReactSharedInternals.getCurrentStack;
+        return null === getCurrentStack ? null : getCurrentStack();
+      };
+      exports.cloneElement = function(element, config, children) {
+        if (null === element || void 0 === element)
+          throw Error(
+            "The argument must be a React element, but you passed " + element + "."
+          );
+        var props = assign({}, element.props), key = element.key, owner = element._owner;
+        if (null != config) {
+          var JSCompiler_inline_result;
+          a: {
+            if (hasOwnProperty.call(config, "ref") && (JSCompiler_inline_result = Object.getOwnPropertyDescriptor(
+              config,
+              "ref"
+            ).get) && JSCompiler_inline_result.isReactWarning) {
+              JSCompiler_inline_result = false;
+              break a;
+            }
+            JSCompiler_inline_result = void 0 !== config.ref;
+          }
+          JSCompiler_inline_result && (owner = getOwner());
+          hasValidKey(config) && (checkKeyStringCoercion(config.key), key = "" + config.key);
+          for (propName in config)
+            !hasOwnProperty.call(config, propName) || "key" === propName || "__self" === propName || "__source" === propName || "ref" === propName && void 0 === config.ref || (props[propName] = config[propName]);
+        }
+        var propName = arguments.length - 2;
+        if (1 === propName) props.children = children;
+        else if (1 < propName) {
+          JSCompiler_inline_result = Array(propName);
+          for (var i = 0; i < propName; i++)
+            JSCompiler_inline_result[i] = arguments[i + 2];
+          props.children = JSCompiler_inline_result;
+        }
+        props = ReactElement(
+          element.type,
+          key,
+          props,
+          owner,
+          element._debugStack,
+          element._debugTask
+        );
+        for (key = 2; key < arguments.length; key++)
+          validateChildKeys(arguments[key]);
+        return props;
+      };
+      exports.createContext = function(defaultValue) {
+        defaultValue = {
+          $$typeof: REACT_CONTEXT_TYPE,
+          _currentValue: defaultValue,
+          _currentValue2: defaultValue,
+          _threadCount: 0,
+          Provider: null,
+          Consumer: null
+        };
+        defaultValue.Provider = defaultValue;
+        defaultValue.Consumer = {
+          $$typeof: REACT_CONSUMER_TYPE,
+          _context: defaultValue
+        };
+        defaultValue._currentRenderer = null;
+        defaultValue._currentRenderer2 = null;
+        return defaultValue;
+      };
+      exports.createElement = function(type, config, children) {
+        for (var i = 2; i < arguments.length; i++)
+          validateChildKeys(arguments[i]);
+        var propName;
+        i = {};
+        var key = null;
+        if (null != config)
+          for (propName in didWarnAboutOldJSXRuntime || !("__self" in config) || "key" in config || (didWarnAboutOldJSXRuntime = true, console.warn(
+            "Your app (or one of its dependencies) is using an outdated JSX transform. Update to the modern JSX transform for faster performance: https://react.dev/link/new-jsx-transform"
+          )), hasValidKey(config) && (checkKeyStringCoercion(config.key), key = "" + config.key), config)
+            hasOwnProperty.call(config, propName) && "key" !== propName && "__self" !== propName && "__source" !== propName && (i[propName] = config[propName]);
+        var childrenLength = arguments.length - 2;
+        if (1 === childrenLength) i.children = children;
+        else if (1 < childrenLength) {
+          for (var childArray = Array(childrenLength), _i = 0; _i < childrenLength; _i++)
+            childArray[_i] = arguments[_i + 2];
+          Object.freeze && Object.freeze(childArray);
+          i.children = childArray;
+        }
+        if (type && type.defaultProps)
+          for (propName in childrenLength = type.defaultProps, childrenLength)
+            void 0 === i[propName] && (i[propName] = childrenLength[propName]);
+        key && defineKeyPropWarningGetter(
+          i,
+          "function" === typeof type ? type.displayName || type.name || "Unknown" : type
+        );
+        (propName = 1e4 > ReactSharedInternals.recentlyCreatedOwnerStacks++) ? (childArray = Error.stackTraceLimit, Error.stackTraceLimit = 10, childrenLength = Error("react-stack-top-frame"), Error.stackTraceLimit = childArray) : childrenLength = unknownOwnerDebugStack;
+        return ReactElement(
+          type,
+          key,
+          i,
+          getOwner(),
+          childrenLength,
+          propName ? createTask(getTaskName(type)) : unknownOwnerDebugTask
+        );
+      };
+      exports.createRef = function() {
+        var refObject = { current: null };
+        Object.seal(refObject);
+        return refObject;
+      };
+      exports.forwardRef = function(render) {
+        null != render && render.$$typeof === REACT_MEMO_TYPE ? console.error(
+          "forwardRef requires a render function but received a `memo` component. Instead of forwardRef(memo(...)), use memo(forwardRef(...))."
+        ) : "function" !== typeof render ? console.error(
+          "forwardRef requires a render function but was given %s.",
+          null === render ? "null" : typeof render
+        ) : 0 !== render.length && 2 !== render.length && console.error(
+          "forwardRef render functions accept exactly two parameters: props and ref. %s",
+          1 === render.length ? "Did you forget to use the ref parameter?" : "Any additional parameter will be undefined."
+        );
+        null != render && null != render.defaultProps && console.error(
+          "forwardRef render functions do not support defaultProps. Did you accidentally pass a React component?"
+        );
+        var elementType = { $$typeof: REACT_FORWARD_REF_TYPE, render }, ownName;
+        Object.defineProperty(elementType, "displayName", {
+          enumerable: false,
+          configurable: true,
+          get: function() {
+            return ownName;
+          },
+          set: function(name) {
+            ownName = name;
+            render.name || render.displayName || (Object.defineProperty(render, "name", { value: name }), render.displayName = name);
+          }
+        });
+        return elementType;
+      };
+      exports.isValidElement = isValidElement;
+      exports.lazy = function(ctor) {
+        ctor = { _status: -1, _result: ctor };
+        var lazyType = {
+          $$typeof: REACT_LAZY_TYPE,
+          _payload: ctor,
+          _init: lazyInitializer
+        }, ioInfo = {
+          name: "lazy",
+          start: -1,
+          end: -1,
+          value: null,
+          owner: null,
+          debugStack: Error("react-stack-top-frame"),
+          debugTask: console.createTask ? console.createTask("lazy()") : null
+        };
+        ctor._ioInfo = ioInfo;
+        lazyType._debugInfo = [{ awaited: ioInfo }];
+        return lazyType;
+      };
+      exports.memo = function(type, compare) {
+        null == type && console.error(
+          "memo: The first argument must be a component. Instead received: %s",
+          null === type ? "null" : typeof type
+        );
+        compare = {
+          $$typeof: REACT_MEMO_TYPE,
+          type,
+          compare: void 0 === compare ? null : compare
+        };
+        var ownName;
+        Object.defineProperty(compare, "displayName", {
+          enumerable: false,
+          configurable: true,
+          get: function() {
+            return ownName;
+          },
+          set: function(name) {
+            ownName = name;
+            type.name || type.displayName || (Object.defineProperty(type, "name", { value: name }), type.displayName = name);
+          }
+        });
+        return compare;
+      };
+      exports.startTransition = startTransition;
+      exports.unstable_useCacheRefresh = function() {
+        return resolveDispatcher().useCacheRefresh();
+      };
+      exports.use = function(usable) {
+        return resolveDispatcher().use(usable);
+      };
+      exports.useActionState = function(action, initialState, permalink) {
+        return resolveDispatcher().useActionState(
+          action,
+          initialState,
+          permalink
+        );
+      };
+      exports.useCallback = function(callback, deps) {
+        return resolveDispatcher().useCallback(callback, deps);
+      };
+      exports.useContext = function(Context) {
+        var dispatcher = resolveDispatcher();
+        Context.$$typeof === REACT_CONSUMER_TYPE && console.error(
+          "Calling useContext(Context.Consumer) is not supported and will cause bugs. Did you mean to call useContext(Context) instead?"
+        );
+        return dispatcher.useContext(Context);
+      };
+      exports.useDebugValue = function(value, formatterFn) {
+        return resolveDispatcher().useDebugValue(value, formatterFn);
+      };
+      exports.useDeferredValue = function(value, initialValue) {
+        return resolveDispatcher().useDeferredValue(value, initialValue);
+      };
+      exports.useEffect = function(create, deps) {
+        null == create && console.warn(
+          "React Hook useEffect requires an effect callback. Did you forget to pass a callback to the hook?"
+        );
+        return resolveDispatcher().useEffect(create, deps);
+      };
+      exports.useEffectEvent = function(callback) {
+        return resolveDispatcher().useEffectEvent(callback);
+      };
+      exports.useId = function() {
+        return resolveDispatcher().useId();
+      };
+      exports.useImperativeHandle = function(ref, create, deps) {
+        return resolveDispatcher().useImperativeHandle(ref, create, deps);
+      };
+      exports.useInsertionEffect = function(create, deps) {
+        null == create && console.warn(
+          "React Hook useInsertionEffect requires an effect callback. Did you forget to pass a callback to the hook?"
+        );
+        return resolveDispatcher().useInsertionEffect(create, deps);
+      };
+      exports.useLayoutEffect = function(create, deps) {
+        null == create && console.warn(
+          "React Hook useLayoutEffect requires an effect callback. Did you forget to pass a callback to the hook?"
+        );
+        return resolveDispatcher().useLayoutEffect(create, deps);
+      };
+      exports.useMemo = function(create, deps) {
+        return resolveDispatcher().useMemo(create, deps);
+      };
+      exports.useOptimistic = function(passthrough, reducer) {
+        return resolveDispatcher().useOptimistic(passthrough, reducer);
+      };
+      exports.useReducer = function(reducer, initialArg, init) {
+        return resolveDispatcher().useReducer(reducer, initialArg, init);
+      };
+      exports.useRef = function(initialValue) {
+        return resolveDispatcher().useRef(initialValue);
+      };
+      exports.useState = function(initialState) {
+        return resolveDispatcher().useState(initialState);
+      };
+      exports.useSyncExternalStore = function(subscribe, getSnapshot, getServerSnapshot) {
+        return resolveDispatcher().useSyncExternalStore(
+          subscribe,
+          getSnapshot,
+          getServerSnapshot
+        );
+      };
+      exports.useTransition = function() {
+        return resolveDispatcher().useTransition();
+      };
+      exports.version = "19.3.1";
+      "undefined" !== typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ && "function" === typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStop && __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStop(Error());
+    })();
+  }
+});
+
+// node_modules/react/index.js
+var require_react = __commonJS({
+  "node_modules/react/index.js"(exports, module) {
+    "use strict";
+    if (false) {
+      module.exports = null;
+    } else {
+      module.exports = require_react_development();
+    }
+  }
+});
+
 // node_modules/jszip/dist/jszip.min.js
 var require_jszip_min = __commonJS({
   "node_modules/jszip/dist/jszip.min.js"(exports, module) {
@@ -2398,1015 +3407,6 @@ var require_jszip_min = __commonJS({
   }
 });
 
-// node_modules/react/cjs/react.development.js
-var require_react_development = __commonJS({
-  "node_modules/react/cjs/react.development.js"(exports, module) {
-    "use strict";
-    (function() {
-      function defineDeprecationWarning(methodName, info) {
-        Object.defineProperty(Component.prototype, methodName, {
-          get: function() {
-            console.warn(
-              "%s(...) is deprecated in plain JavaScript React classes. %s",
-              info[0],
-              info[1]
-            );
-          }
-        });
-      }
-      function getIteratorFn(maybeIterable) {
-        if (null === maybeIterable || "object" !== typeof maybeIterable)
-          return null;
-        maybeIterable = MAYBE_ITERATOR_SYMBOL && maybeIterable[MAYBE_ITERATOR_SYMBOL] || maybeIterable["@@iterator"];
-        return "function" === typeof maybeIterable ? maybeIterable : null;
-      }
-      function warnNoop(publicInstance, callerName) {
-        publicInstance = (publicInstance = publicInstance.constructor) && (publicInstance.displayName || publicInstance.name) || "ReactClass";
-        var warningKey = publicInstance + "." + callerName;
-        didWarnStateUpdateForUnmountedComponent[warningKey] || (console.error(
-          "Can't call %s on a component that is not yet mounted. This is a no-op, but it might indicate a bug in your application. Instead, assign to `this.state` directly or define a `state = {};` class property with the desired state in the %s component.",
-          callerName,
-          publicInstance
-        ), didWarnStateUpdateForUnmountedComponent[warningKey] = true);
-      }
-      function Component(props, context, updater) {
-        this.props = props;
-        this.context = context;
-        this.refs = emptyObject;
-        this.updater = updater || ReactNoopUpdateQueue;
-      }
-      function ComponentDummy() {
-      }
-      function PureComponent(props, context, updater) {
-        this.props = props;
-        this.context = context;
-        this.refs = emptyObject;
-        this.updater = updater || ReactNoopUpdateQueue;
-      }
-      function noop() {
-      }
-      function testStringCoercion(value) {
-        return "" + value;
-      }
-      function checkKeyStringCoercion(value) {
-        try {
-          testStringCoercion(value);
-          var JSCompiler_inline_result = false;
-        } catch (e) {
-          JSCompiler_inline_result = true;
-        }
-        if (JSCompiler_inline_result) {
-          JSCompiler_inline_result = console;
-          var JSCompiler_temp_const = JSCompiler_inline_result.error;
-          var JSCompiler_inline_result$jscomp$0 = "function" === typeof Symbol && Symbol.toStringTag && value[Symbol.toStringTag] || value.constructor.name || "Object";
-          JSCompiler_temp_const.call(
-            JSCompiler_inline_result,
-            "The provided key is an unsupported type %s. This value must be coerced to a string before using it here.",
-            JSCompiler_inline_result$jscomp$0
-          );
-          return testStringCoercion(value);
-        }
-      }
-      function getComponentNameFromType(type) {
-        if (null == type) return null;
-        if ("function" === typeof type)
-          return type.$$typeof === REACT_CLIENT_REFERENCE ? null : type.displayName || type.name || null;
-        if ("string" === typeof type) return type;
-        switch (type) {
-          case REACT_FRAGMENT_TYPE:
-            return "Fragment";
-          case REACT_PROFILER_TYPE:
-            return "Profiler";
-          case REACT_STRICT_MODE_TYPE:
-            return "StrictMode";
-          case REACT_SUSPENSE_TYPE:
-            return "Suspense";
-          case REACT_SUSPENSE_LIST_TYPE:
-            return "SuspenseList";
-          case REACT_ACTIVITY_TYPE:
-            return "Activity";
-          case REACT_VIEW_TRANSITION_TYPE:
-            return "ViewTransition";
-        }
-        if ("object" === typeof type)
-          switch ("number" === typeof type.tag && console.error(
-            "Received an unexpected object in getComponentNameFromType(). This is likely a bug in React. Please file an issue."
-          ), type.$$typeof) {
-            case REACT_PORTAL_TYPE:
-              return "Portal";
-            case REACT_CONTEXT_TYPE:
-              return type.displayName || "Context";
-            case REACT_CONSUMER_TYPE:
-              return (type._context.displayName || "Context") + ".Consumer";
-            case REACT_FORWARD_REF_TYPE:
-              var innerType = type.render;
-              type = type.displayName;
-              type || (type = innerType.displayName || innerType.name || "", type = "" !== type ? "ForwardRef(" + type + ")" : "ForwardRef");
-              return type;
-            case REACT_MEMO_TYPE:
-              return innerType = type.displayName || null, null !== innerType ? innerType : getComponentNameFromType(type.type) || "Memo";
-            case REACT_LAZY_TYPE:
-              innerType = type._payload;
-              type = type._init;
-              try {
-                return getComponentNameFromType(type(innerType));
-              } catch (x) {
-              }
-          }
-        return null;
-      }
-      function getTaskName(type) {
-        if (type === REACT_FRAGMENT_TYPE) return "<>";
-        if ("object" === typeof type && null !== type && type.$$typeof === REACT_LAZY_TYPE)
-          return "<...>";
-        try {
-          var name = getComponentNameFromType(type);
-          return name ? "<" + name + ">" : "<...>";
-        } catch (x) {
-          return "<...>";
-        }
-      }
-      function getOwner() {
-        var dispatcher = ReactSharedInternals.A;
-        return null === dispatcher ? null : dispatcher.getOwner();
-      }
-      function UnknownOwner() {
-        return Error("react-stack-top-frame");
-      }
-      function hasValidKey(config) {
-        if (hasOwnProperty.call(config, "key")) {
-          var getter = Object.getOwnPropertyDescriptor(config, "key").get;
-          if (getter && getter.isReactWarning) return false;
-        }
-        return void 0 !== config.key;
-      }
-      function defineKeyPropWarningGetter(props, displayName) {
-        function warnAboutAccessingKey() {
-          specialPropKeyWarningShown || (specialPropKeyWarningShown = true, console.error(
-            "%s: `key` is not a prop. Trying to access it will result in `undefined` being returned. If you need to access the same value within the child component, you should pass it as a different prop. (https://react.dev/link/special-props)",
-            displayName
-          ));
-        }
-        warnAboutAccessingKey.isReactWarning = true;
-        Object.defineProperty(props, "key", {
-          get: warnAboutAccessingKey,
-          configurable: true
-        });
-      }
-      function elementRefGetterWithDeprecationWarning() {
-        var componentName = getComponentNameFromType(this.type);
-        didWarnAboutElementRef[componentName] || (didWarnAboutElementRef[componentName] = true, console.error(
-          "Accessing element.ref was removed in React 19. ref is now a regular prop. It will be removed from the JSX Element type in a future release."
-        ));
-        componentName = this.props.ref;
-        return void 0 !== componentName ? componentName : null;
-      }
-      function ReactElement(type, key, props, owner, debugStack, debugTask) {
-        var refProp = props.ref;
-        type = {
-          $$typeof: REACT_ELEMENT_TYPE,
-          type,
-          key,
-          props,
-          _owner: owner
-        };
-        null !== (void 0 !== refProp ? refProp : null) ? Object.defineProperty(type, "ref", {
-          enumerable: false,
-          get: elementRefGetterWithDeprecationWarning
-        }) : Object.defineProperty(type, "ref", { enumerable: false, value: null });
-        type._store = {};
-        Object.defineProperty(type._store, "validated", {
-          configurable: false,
-          enumerable: false,
-          writable: true,
-          value: 0
-        });
-        Object.defineProperty(type, "_debugInfo", {
-          configurable: false,
-          enumerable: false,
-          writable: true,
-          value: null
-        });
-        Object.defineProperty(type, "_debugStack", {
-          configurable: false,
-          enumerable: false,
-          writable: true,
-          value: debugStack
-        });
-        Object.defineProperty(type, "_debugTask", {
-          configurable: false,
-          enumerable: false,
-          writable: true,
-          value: debugTask
-        });
-        Object.freeze && (Object.freeze(type.props), Object.freeze(type));
-        return type;
-      }
-      function cloneAndReplaceKey(oldElement, newKey) {
-        newKey = ReactElement(
-          oldElement.type,
-          newKey,
-          oldElement.props,
-          oldElement._owner,
-          oldElement._debugStack,
-          oldElement._debugTask
-        );
-        oldElement._store && (newKey._store.validated = oldElement._store.validated);
-        return newKey;
-      }
-      function validateChildKeys(node) {
-        isValidElement(node) ? node._store && (node._store.validated = 1) : "object" === typeof node && null !== node && node.$$typeof === REACT_LAZY_TYPE && ("fulfilled" === node._payload.status ? isValidElement(node._payload.value) && node._payload.value._store && (node._payload.value._store.validated = 1) : node._store && (node._store.validated = 1));
-      }
-      function isValidElement(object) {
-        return "object" === typeof object && null !== object && object.$$typeof === REACT_ELEMENT_TYPE;
-      }
-      function escape(key) {
-        var escaperLookup = { "=": "=0", ":": "=2" };
-        return "$" + key.replace(/[=:]/g, function(match) {
-          return escaperLookup[match];
-        });
-      }
-      function getElementKey(element, index) {
-        return "object" === typeof element && null !== element && null != element.key ? (checkKeyStringCoercion(element.key), escape("" + element.key)) : index.toString(36);
-      }
-      function resolveThenable(thenable) {
-        switch (thenable.status) {
-          case "fulfilled":
-            return thenable.value;
-          case "rejected":
-            throw thenable.reason;
-          default:
-            switch ("string" === typeof thenable.status ? thenable.then(noop, noop) : (thenable.status = "pending", thenable.then(
-              function(fulfilledValue) {
-                "pending" === thenable.status && (thenable.status = "fulfilled", thenable.value = fulfilledValue);
-              },
-              function(error) {
-                "pending" === thenable.status && (thenable.status = "rejected", thenable.reason = error);
-              }
-            )), thenable.status) {
-              case "fulfilled":
-                return thenable.value;
-              case "rejected":
-                throw thenable.reason;
-            }
-        }
-        throw thenable;
-      }
-      function mapIntoArray(children, array, escapedPrefix, nameSoFar, callback) {
-        var type = typeof children;
-        if ("undefined" === type || "boolean" === type) children = null;
-        var invokeCallback = false;
-        if (null === children) invokeCallback = true;
-        else
-          switch (type) {
-            case "bigint":
-            case "string":
-            case "number":
-              invokeCallback = true;
-              break;
-            case "object":
-              switch (children.$$typeof) {
-                case REACT_ELEMENT_TYPE:
-                case REACT_PORTAL_TYPE:
-                  invokeCallback = true;
-                  break;
-                case REACT_LAZY_TYPE:
-                  return invokeCallback = children._init, mapIntoArray(
-                    invokeCallback(children._payload),
-                    array,
-                    escapedPrefix,
-                    nameSoFar,
-                    callback
-                  );
-              }
-          }
-        if (invokeCallback) {
-          invokeCallback = children;
-          callback = callback(invokeCallback);
-          var childKey = "" === nameSoFar ? "." + getElementKey(invokeCallback, 0) : nameSoFar;
-          isArrayImpl(callback) ? (escapedPrefix = "", null != childKey && (escapedPrefix = childKey.replace(userProvidedKeyEscapeRegex, "$&/") + "/"), mapIntoArray(callback, array, escapedPrefix, "", function(c) {
-            return c;
-          })) : null != callback && (isValidElement(callback) && (null != callback.key && (invokeCallback && invokeCallback.key === callback.key || checkKeyStringCoercion(callback.key)), escapedPrefix = cloneAndReplaceKey(
-            callback,
-            escapedPrefix + (null == callback.key || invokeCallback && invokeCallback.key === callback.key ? "" : ("" + callback.key).replace(
-              userProvidedKeyEscapeRegex,
-              "$&/"
-            ) + "/") + childKey
-          ), "" !== nameSoFar && null != invokeCallback && isValidElement(invokeCallback) && null == invokeCallback.key && invokeCallback._store && !invokeCallback._store.validated && (escapedPrefix._store.validated = 2), callback = escapedPrefix), array.push(callback));
-          return 1;
-        }
-        invokeCallback = 0;
-        childKey = "" === nameSoFar ? "." : nameSoFar + ":";
-        if (isArrayImpl(children))
-          for (var i = 0; i < children.length; i++)
-            nameSoFar = children[i], type = childKey + getElementKey(nameSoFar, i), invokeCallback += mapIntoArray(
-              nameSoFar,
-              array,
-              escapedPrefix,
-              type,
-              callback
-            );
-        else if (i = getIteratorFn(children), "function" === typeof i)
-          for (i === children.entries && (didWarnAboutMaps || console.warn(
-            "Using Maps as children is not supported. Use an array of keyed ReactElements instead."
-          ), didWarnAboutMaps = true), children = i.call(children), i = 0; !(nameSoFar = children.next()).done; )
-            nameSoFar = nameSoFar.value, type = childKey + getElementKey(nameSoFar, i++), invokeCallback += mapIntoArray(
-              nameSoFar,
-              array,
-              escapedPrefix,
-              type,
-              callback
-            );
-        else if ("object" === type) {
-          if ("function" === typeof children.then)
-            return mapIntoArray(
-              resolveThenable(children),
-              array,
-              escapedPrefix,
-              nameSoFar,
-              callback
-            );
-          array = String(children);
-          throw Error(
-            "Objects are not valid as a React child (found: " + ("[object Object]" === array ? "object with keys {" + Object.keys(children).join(", ") + "}" : array) + "). If you meant to render a collection of children, use an array instead."
-          );
-        }
-        return invokeCallback;
-      }
-      function mapChildren(children, func, context) {
-        if (null == children) return children;
-        var result = [], count = 0;
-        mapIntoArray(children, result, "", "", function(child) {
-          return func.call(context, child, count++);
-        });
-        return result;
-      }
-      function lazyInitializer(payload) {
-        if (-1 === payload._status) {
-          var resolveDebugValue = null, rejectDebugValue = null, ioInfo = payload._ioInfo;
-          null != ioInfo && (ioInfo.start = ioInfo.end = performance.now(), ioInfo.value = new Promise(function(resolve, reject) {
-            resolveDebugValue = resolve;
-            rejectDebugValue = reject;
-          }));
-          ioInfo = payload._result;
-          var thenable = ioInfo();
-          thenable.then(
-            function(moduleObject) {
-              if (0 === payload._status || -1 === payload._status) {
-                payload._status = 1;
-                payload._result = moduleObject;
-                var _ioInfo = payload._ioInfo;
-                if (null != _ioInfo) {
-                  _ioInfo.end = performance.now();
-                  var debugValue = null == moduleObject ? void 0 : moduleObject.default;
-                  resolveDebugValue(debugValue);
-                  _ioInfo.value.status = "fulfilled";
-                  _ioInfo.value.value = debugValue;
-                }
-                void 0 === thenable.status && (thenable.status = "fulfilled", thenable.value = moduleObject);
-              }
-            },
-            function(error) {
-              if (0 === payload._status || -1 === payload._status) {
-                payload._status = 2;
-                payload._result = error;
-                var _ioInfo2 = payload._ioInfo;
-                null != _ioInfo2 && (_ioInfo2.end = performance.now(), _ioInfo2.value.then(noop, noop), rejectDebugValue(error), _ioInfo2.value.status = "rejected", _ioInfo2.value.reason = error);
-                void 0 === thenable.status && (thenable.status = "rejected", thenable.reason = error);
-              }
-            }
-          );
-          ioInfo = payload._ioInfo;
-          if (null != ioInfo) {
-            var displayName = thenable.displayName;
-            "string" === typeof displayName && (ioInfo.name = displayName);
-          }
-          -1 === payload._status && (payload._status = 0, payload._result = thenable);
-        }
-        if (1 === payload._status)
-          return ioInfo = payload._result, void 0 === ioInfo && console.error(
-            "lazy: Expected the result of a dynamic import() call. Instead received: %s\n\nYour code should look like: \n  const MyComponent = lazy(() => import('./MyComponent'))\n\nDid you accidentally put curly braces around the import?",
-            ioInfo
-          ), "default" in ioInfo || console.error(
-            "lazy: Expected the result of a dynamic import() call. Instead received: %s\n\nYour code should look like: \n  const MyComponent = lazy(() => import('./MyComponent'))",
-            ioInfo
-          ), ioInfo.default;
-        throw payload._result;
-      }
-      function resolveDispatcher() {
-        var dispatcher = ReactSharedInternals.H;
-        null === dispatcher && console.error(
-          "Invalid hook call. Hooks can only be called inside of the body of a function component. This could happen for one of the following reasons:\n1. You might have mismatching versions of React and the renderer (such as React DOM)\n2. You might be breaking the Rules of Hooks\n3. You might have more than one copy of React in the same app\nSee https://react.dev/link/invalid-hook-call for tips about how to debug and fix this problem."
-        );
-        return dispatcher;
-      }
-      function releaseAsyncTransition() {
-        ReactSharedInternals.asyncTransitions--;
-      }
-      function startTransition(scope) {
-        var prevTransition = ReactSharedInternals.T, currentTransition = {};
-        currentTransition.types = null !== prevTransition ? prevTransition.types : null;
-        currentTransition._updatedFibers = /* @__PURE__ */ new Set();
-        ReactSharedInternals.T = currentTransition;
-        try {
-          var returnValue = scope(), onStartTransitionFinish = ReactSharedInternals.S;
-          null !== onStartTransitionFinish && onStartTransitionFinish(currentTransition, returnValue);
-          "object" === typeof returnValue && null !== returnValue && "function" === typeof returnValue.then && (ReactSharedInternals.asyncTransitions++, returnValue.then(releaseAsyncTransition, releaseAsyncTransition), returnValue.then(noop, reportGlobalError));
-        } catch (error) {
-          reportGlobalError(error);
-        } finally {
-          null === prevTransition && currentTransition._updatedFibers && (scope = currentTransition._updatedFibers.size, currentTransition._updatedFibers.clear(), 10 < scope && console.warn(
-            "Detected a large number of updates inside startTransition. If this is due to a subscription please re-write it to use React provided hooks. Otherwise concurrent mode guarantees are off the table."
-          )), null !== prevTransition && null !== currentTransition.types && (null !== prevTransition.types && prevTransition.types !== currentTransition.types && console.error(
-            "We expected inner Transitions to have transferred the outer types set and that you cannot add to the outer Transition while inside the inner.This is a bug in React."
-          ), prevTransition.types = currentTransition.types), ReactSharedInternals.T = prevTransition;
-        }
-      }
-      function addTransitionType(type) {
-        var transition = ReactSharedInternals.T;
-        if (null !== transition) {
-          var transitionTypes = transition.types;
-          null === transitionTypes ? transition.types = [type] : -1 === transitionTypes.indexOf(type) && transitionTypes.push(type);
-        } else
-          0 === ReactSharedInternals.asyncTransitions && console.error(
-            "addTransitionType can only be called inside a `startTransition()` callback. It must be associated with a specific Transition."
-          ), startTransition(addTransitionType.bind(null, type));
-      }
-      function enqueueTask(task) {
-        if (null === enqueueTaskImpl)
-          try {
-            var requireString = ("require" + Math.random()).slice(0, 7);
-            enqueueTaskImpl = (module && module[requireString]).call(
-              module,
-              "timers"
-            ).setImmediate;
-          } catch (_err) {
-            enqueueTaskImpl = function(callback) {
-              false === didWarnAboutMessageChannel && (didWarnAboutMessageChannel = true, "undefined" === typeof MessageChannel && console.error(
-                "This browser does not have a MessageChannel implementation, so enqueuing tasks via await act(async () => ...) will fail. Please file an issue at https://github.com/facebook/react/issues if you encounter this warning."
-              ));
-              var channel = new MessageChannel();
-              channel.port1.onmessage = callback;
-              channel.port2.postMessage(void 0);
-            };
-          }
-        return enqueueTaskImpl(task);
-      }
-      function aggregateErrors(errors) {
-        return 1 < errors.length && "function" === typeof AggregateError ? new AggregateError(errors) : errors[0];
-      }
-      function popActScope(prevActQueue, prevActScopeDepth) {
-        prevActScopeDepth !== actScopeDepth - 1 && console.error(
-          "You seem to have overlapping act() calls, this is not supported. Be sure to await previous act() calls before making a new one. "
-        );
-        actScopeDepth = prevActScopeDepth;
-      }
-      function recursivelyFlushAsyncActWork(returnValue, resolve, reject) {
-        var queue = ReactSharedInternals.actQueue;
-        if (null !== queue)
-          if (0 !== queue.length)
-            try {
-              flushActQueue(queue);
-              enqueueTask(function() {
-                return recursivelyFlushAsyncActWork(returnValue, resolve, reject);
-              });
-              return;
-            } catch (error) {
-              ReactSharedInternals.thrownErrors.push(error);
-            }
-          else ReactSharedInternals.actQueue = null;
-        0 < ReactSharedInternals.thrownErrors.length ? (queue = aggregateErrors(ReactSharedInternals.thrownErrors), ReactSharedInternals.thrownErrors.length = 0, reject(queue)) : resolve(returnValue);
-      }
-      function flushActQueue(queue) {
-        if (!isFlushing) {
-          isFlushing = true;
-          var i = 0;
-          try {
-            for (; i < queue.length; i++) {
-              var callback = queue[i];
-              do {
-                ReactSharedInternals.didUsePromise = false;
-                var continuation = callback(false);
-                if (null !== continuation) {
-                  if (ReactSharedInternals.didUsePromise) {
-                    queue[i] = callback;
-                    queue.splice(0, i);
-                    return;
-                  }
-                  callback = continuation;
-                } else break;
-              } while (1);
-            }
-            queue.length = 0;
-          } catch (error) {
-            queue.splice(0, i + 1), ReactSharedInternals.thrownErrors.push(error);
-          } finally {
-            isFlushing = false;
-          }
-        }
-      }
-      "undefined" !== typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ && "function" === typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart && __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(Error());
-      var REACT_ELEMENT_TYPE = Symbol.for("react.transitional.element"), REACT_PORTAL_TYPE = Symbol.for("react.portal"), REACT_FRAGMENT_TYPE = Symbol.for("react.fragment"), REACT_STRICT_MODE_TYPE = Symbol.for("react.strict_mode"), REACT_PROFILER_TYPE = Symbol.for("react.profiler"), REACT_CONSUMER_TYPE = Symbol.for("react.consumer"), REACT_CONTEXT_TYPE = Symbol.for("react.context"), REACT_FORWARD_REF_TYPE = Symbol.for("react.forward_ref"), REACT_SUSPENSE_TYPE = Symbol.for("react.suspense"), REACT_SUSPENSE_LIST_TYPE = Symbol.for("react.suspense_list"), REACT_MEMO_TYPE = Symbol.for("react.memo"), REACT_LAZY_TYPE = Symbol.for("react.lazy"), REACT_ACTIVITY_TYPE = Symbol.for("react.activity"), REACT_VIEW_TRANSITION_TYPE = Symbol.for("react.view_transition"), MAYBE_ITERATOR_SYMBOL = Symbol.iterator, didWarnStateUpdateForUnmountedComponent = {}, ReactNoopUpdateQueue = {
-        isMounted: function() {
-          return false;
-        },
-        enqueueForceUpdate: function(publicInstance) {
-          warnNoop(publicInstance, "forceUpdate");
-        },
-        enqueueReplaceState: function(publicInstance) {
-          warnNoop(publicInstance, "replaceState");
-        },
-        enqueueSetState: function(publicInstance) {
-          warnNoop(publicInstance, "setState");
-        }
-      }, assign = Object.assign, emptyObject = {};
-      Object.freeze(emptyObject);
-      Component.prototype.isReactComponent = {};
-      Component.prototype.setState = function(partialState, callback) {
-        if ("object" !== typeof partialState && "function" !== typeof partialState && null != partialState)
-          throw Error(
-            "takes an object of state variables to update or a function which returns an object of state variables."
-          );
-        this.updater.enqueueSetState(this, partialState, callback, "setState");
-      };
-      Component.prototype.forceUpdate = function(callback) {
-        this.updater.enqueueForceUpdate(this, callback, "forceUpdate");
-      };
-      var deprecatedAPIs = {
-        isMounted: [
-          "isMounted",
-          "Instead, make sure to clean up subscriptions and pending requests in componentWillUnmount to prevent memory leaks."
-        ],
-        replaceState: [
-          "replaceState",
-          "Refactor your code to use setState instead (see https://github.com/facebook/react/issues/3236)."
-        ]
-      };
-      for (fnName in deprecatedAPIs)
-        deprecatedAPIs.hasOwnProperty(fnName) && defineDeprecationWarning(fnName, deprecatedAPIs[fnName]);
-      ComponentDummy.prototype = Component.prototype;
-      deprecatedAPIs = PureComponent.prototype = new ComponentDummy();
-      deprecatedAPIs.constructor = PureComponent;
-      assign(deprecatedAPIs, Component.prototype);
-      deprecatedAPIs.isPureReactComponent = true;
-      var isArrayImpl = Array.isArray, REACT_CLIENT_REFERENCE = Symbol.for("react.client.reference"), ReactSharedInternals = {
-        H: null,
-        A: null,
-        T: null,
-        S: null,
-        actQueue: null,
-        asyncTransitions: 0,
-        isBatchingLegacy: false,
-        didScheduleLegacyUpdate: false,
-        didUsePromise: false,
-        thrownErrors: [],
-        getCurrentStack: null,
-        recentlyCreatedOwnerStacks: 0
-      }, hasOwnProperty = Object.prototype.hasOwnProperty, createTask = console.createTask ? console.createTask : function() {
-        return null;
-      };
-      deprecatedAPIs = {
-        react_stack_bottom_frame: function(callStackForError) {
-          return callStackForError();
-        }
-      };
-      var specialPropKeyWarningShown, didWarnAboutOldJSXRuntime;
-      var didWarnAboutElementRef = {};
-      var unknownOwnerDebugStack = deprecatedAPIs.react_stack_bottom_frame.bind(
-        deprecatedAPIs,
-        UnknownOwner
-      )();
-      var unknownOwnerDebugTask = createTask(getTaskName(UnknownOwner));
-      var didWarnAboutMaps = false, userProvidedKeyEscapeRegex = /\/+/g, reportGlobalError = "function" === typeof reportError ? reportError : function(error) {
-        if ("object" === typeof window && "function" === typeof window.ErrorEvent) {
-          var event = new window.ErrorEvent("error", {
-            bubbles: true,
-            cancelable: true,
-            message: "object" === typeof error && null !== error && "string" === typeof error.message ? String(error.message) : String(error),
-            error
-          });
-          if (!window.dispatchEvent(event)) return;
-        } else if ("object" === typeof process && "function" === typeof process.emit) {
-          process.emit("uncaughtException", error);
-          return;
-        }
-        console.error(error);
-      }, didWarnAboutMessageChannel = false, enqueueTaskImpl = null, actScopeDepth = 0, didWarnNoAwaitAct = false, isFlushing = false, queueSeveralMicrotasks = "function" === typeof queueMicrotask ? function(callback) {
-        queueMicrotask(function() {
-          return queueMicrotask(callback);
-        });
-      } : enqueueTask;
-      deprecatedAPIs = Object.freeze({
-        __proto__: null,
-        c: function(size) {
-          return resolveDispatcher().useMemoCache(size);
-        }
-      });
-      var fnName = {
-        map: mapChildren,
-        forEach: function(children, forEachFunc, forEachContext) {
-          mapChildren(
-            children,
-            function() {
-              forEachFunc.apply(this, arguments);
-            },
-            forEachContext
-          );
-        },
-        count: function(children) {
-          var n = 0;
-          mapChildren(children, function() {
-            n++;
-          });
-          return n;
-        },
-        toArray: function(children) {
-          return mapChildren(children, function(child) {
-            return child;
-          }) || [];
-        },
-        only: function(children) {
-          if (!isValidElement(children))
-            throw Error(
-              "React.Children.only expected to receive a single React element child."
-            );
-          return children;
-        }
-      };
-      exports.Activity = REACT_ACTIVITY_TYPE;
-      exports.Children = fnName;
-      exports.Component = Component;
-      exports.Fragment = REACT_FRAGMENT_TYPE;
-      exports.Profiler = REACT_PROFILER_TYPE;
-      exports.PureComponent = PureComponent;
-      exports.StrictMode = REACT_STRICT_MODE_TYPE;
-      exports.Suspense = REACT_SUSPENSE_TYPE;
-      exports.ViewTransition = REACT_VIEW_TRANSITION_TYPE;
-      exports.__CLIENT_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE = ReactSharedInternals;
-      exports.__COMPILER_RUNTIME = deprecatedAPIs;
-      exports.act = function(callback) {
-        var prevActQueue = ReactSharedInternals.actQueue, prevActScopeDepth = actScopeDepth;
-        actScopeDepth++;
-        var queue = ReactSharedInternals.actQueue = null !== prevActQueue ? prevActQueue : [], didAwaitActCall = false;
-        try {
-          var result = callback();
-        } catch (error) {
-          ReactSharedInternals.thrownErrors.push(error);
-        }
-        if (0 < ReactSharedInternals.thrownErrors.length)
-          throw popActScope(prevActQueue, prevActScopeDepth), callback = aggregateErrors(ReactSharedInternals.thrownErrors), ReactSharedInternals.thrownErrors.length = 0, callback;
-        if (null !== result && "object" === typeof result && "function" === typeof result.then) {
-          var thenable = result;
-          queueSeveralMicrotasks(function() {
-            didAwaitActCall || didWarnNoAwaitAct || (didWarnNoAwaitAct = true, console.error(
-              "You called act(async () => ...) without await. This could lead to unexpected testing behaviour, interleaving multiple act calls and mixing their scopes. You should - await act(async () => ...);"
-            ));
-          });
-          return {
-            then: function(resolve, reject) {
-              didAwaitActCall = true;
-              thenable.then(
-                function(returnValue) {
-                  popActScope(prevActQueue, prevActScopeDepth);
-                  if (0 === prevActScopeDepth) {
-                    try {
-                      flushActQueue(queue), enqueueTask(function() {
-                        return recursivelyFlushAsyncActWork(
-                          returnValue,
-                          resolve,
-                          reject
-                        );
-                      });
-                    } catch (error$0) {
-                      ReactSharedInternals.thrownErrors.push(error$0);
-                    }
-                    if (0 < ReactSharedInternals.thrownErrors.length) {
-                      var _thrownError = aggregateErrors(
-                        ReactSharedInternals.thrownErrors
-                      );
-                      ReactSharedInternals.thrownErrors.length = 0;
-                      reject(_thrownError);
-                    }
-                  } else resolve(returnValue);
-                },
-                function(error) {
-                  popActScope(prevActQueue, prevActScopeDepth);
-                  0 < ReactSharedInternals.thrownErrors.length ? (error = aggregateErrors(
-                    ReactSharedInternals.thrownErrors
-                  ), ReactSharedInternals.thrownErrors.length = 0, reject(error)) : reject(error);
-                }
-              );
-            }
-          };
-        }
-        var returnValue$jscomp$0 = result;
-        popActScope(prevActQueue, prevActScopeDepth);
-        0 === prevActScopeDepth && (flushActQueue(queue), 0 !== queue.length && queueSeveralMicrotasks(function() {
-          didAwaitActCall || didWarnNoAwaitAct || (didWarnNoAwaitAct = true, console.error(
-            "A component suspended inside an `act` scope, but the `act` call was not awaited. When testing React components that depend on asynchronous data, you must await the result:\n\nawait act(() => ...)"
-          ));
-        }), ReactSharedInternals.actQueue = null);
-        if (0 < ReactSharedInternals.thrownErrors.length)
-          throw callback = aggregateErrors(ReactSharedInternals.thrownErrors), ReactSharedInternals.thrownErrors.length = 0, callback;
-        return {
-          then: function(resolve, reject) {
-            didAwaitActCall = true;
-            0 === prevActScopeDepth ? (ReactSharedInternals.actQueue = queue, enqueueTask(function() {
-              return recursivelyFlushAsyncActWork(
-                returnValue$jscomp$0,
-                resolve,
-                reject
-              );
-            })) : resolve(returnValue$jscomp$0);
-          }
-        };
-      };
-      exports.addTransitionType = addTransitionType;
-      exports.cache = function(fn) {
-        return function() {
-          return fn.apply(null, arguments);
-        };
-      };
-      exports.cacheSignal = function() {
-        return null;
-      };
-      exports.captureOwnerStack = function() {
-        var getCurrentStack = ReactSharedInternals.getCurrentStack;
-        return null === getCurrentStack ? null : getCurrentStack();
-      };
-      exports.cloneElement = function(element, config, children) {
-        if (null === element || void 0 === element)
-          throw Error(
-            "The argument must be a React element, but you passed " + element + "."
-          );
-        var props = assign({}, element.props), key = element.key, owner = element._owner;
-        if (null != config) {
-          var JSCompiler_inline_result;
-          a: {
-            if (hasOwnProperty.call(config, "ref") && (JSCompiler_inline_result = Object.getOwnPropertyDescriptor(
-              config,
-              "ref"
-            ).get) && JSCompiler_inline_result.isReactWarning) {
-              JSCompiler_inline_result = false;
-              break a;
-            }
-            JSCompiler_inline_result = void 0 !== config.ref;
-          }
-          JSCompiler_inline_result && (owner = getOwner());
-          hasValidKey(config) && (checkKeyStringCoercion(config.key), key = "" + config.key);
-          for (propName in config)
-            !hasOwnProperty.call(config, propName) || "key" === propName || "__self" === propName || "__source" === propName || "ref" === propName && void 0 === config.ref || (props[propName] = config[propName]);
-        }
-        var propName = arguments.length - 2;
-        if (1 === propName) props.children = children;
-        else if (1 < propName) {
-          JSCompiler_inline_result = Array(propName);
-          for (var i = 0; i < propName; i++)
-            JSCompiler_inline_result[i] = arguments[i + 2];
-          props.children = JSCompiler_inline_result;
-        }
-        props = ReactElement(
-          element.type,
-          key,
-          props,
-          owner,
-          element._debugStack,
-          element._debugTask
-        );
-        for (key = 2; key < arguments.length; key++)
-          validateChildKeys(arguments[key]);
-        return props;
-      };
-      exports.createContext = function(defaultValue) {
-        defaultValue = {
-          $$typeof: REACT_CONTEXT_TYPE,
-          _currentValue: defaultValue,
-          _currentValue2: defaultValue,
-          _threadCount: 0,
-          Provider: null,
-          Consumer: null
-        };
-        defaultValue.Provider = defaultValue;
-        defaultValue.Consumer = {
-          $$typeof: REACT_CONSUMER_TYPE,
-          _context: defaultValue
-        };
-        defaultValue._currentRenderer = null;
-        defaultValue._currentRenderer2 = null;
-        return defaultValue;
-      };
-      exports.createElement = function(type, config, children) {
-        for (var i = 2; i < arguments.length; i++)
-          validateChildKeys(arguments[i]);
-        var propName;
-        i = {};
-        var key = null;
-        if (null != config)
-          for (propName in didWarnAboutOldJSXRuntime || !("__self" in config) || "key" in config || (didWarnAboutOldJSXRuntime = true, console.warn(
-            "Your app (or one of its dependencies) is using an outdated JSX transform. Update to the modern JSX transform for faster performance: https://react.dev/link/new-jsx-transform"
-          )), hasValidKey(config) && (checkKeyStringCoercion(config.key), key = "" + config.key), config)
-            hasOwnProperty.call(config, propName) && "key" !== propName && "__self" !== propName && "__source" !== propName && (i[propName] = config[propName]);
-        var childrenLength = arguments.length - 2;
-        if (1 === childrenLength) i.children = children;
-        else if (1 < childrenLength) {
-          for (var childArray = Array(childrenLength), _i = 0; _i < childrenLength; _i++)
-            childArray[_i] = arguments[_i + 2];
-          Object.freeze && Object.freeze(childArray);
-          i.children = childArray;
-        }
-        if (type && type.defaultProps)
-          for (propName in childrenLength = type.defaultProps, childrenLength)
-            void 0 === i[propName] && (i[propName] = childrenLength[propName]);
-        key && defineKeyPropWarningGetter(
-          i,
-          "function" === typeof type ? type.displayName || type.name || "Unknown" : type
-        );
-        (propName = 1e4 > ReactSharedInternals.recentlyCreatedOwnerStacks++) ? (childArray = Error.stackTraceLimit, Error.stackTraceLimit = 10, childrenLength = Error("react-stack-top-frame"), Error.stackTraceLimit = childArray) : childrenLength = unknownOwnerDebugStack;
-        return ReactElement(
-          type,
-          key,
-          i,
-          getOwner(),
-          childrenLength,
-          propName ? createTask(getTaskName(type)) : unknownOwnerDebugTask
-        );
-      };
-      exports.createRef = function() {
-        var refObject = { current: null };
-        Object.seal(refObject);
-        return refObject;
-      };
-      exports.forwardRef = function(render) {
-        null != render && render.$$typeof === REACT_MEMO_TYPE ? console.error(
-          "forwardRef requires a render function but received a `memo` component. Instead of forwardRef(memo(...)), use memo(forwardRef(...))."
-        ) : "function" !== typeof render ? console.error(
-          "forwardRef requires a render function but was given %s.",
-          null === render ? "null" : typeof render
-        ) : 0 !== render.length && 2 !== render.length && console.error(
-          "forwardRef render functions accept exactly two parameters: props and ref. %s",
-          1 === render.length ? "Did you forget to use the ref parameter?" : "Any additional parameter will be undefined."
-        );
-        null != render && null != render.defaultProps && console.error(
-          "forwardRef render functions do not support defaultProps. Did you accidentally pass a React component?"
-        );
-        var elementType = { $$typeof: REACT_FORWARD_REF_TYPE, render }, ownName;
-        Object.defineProperty(elementType, "displayName", {
-          enumerable: false,
-          configurable: true,
-          get: function() {
-            return ownName;
-          },
-          set: function(name) {
-            ownName = name;
-            render.name || render.displayName || (Object.defineProperty(render, "name", { value: name }), render.displayName = name);
-          }
-        });
-        return elementType;
-      };
-      exports.isValidElement = isValidElement;
-      exports.lazy = function(ctor) {
-        ctor = { _status: -1, _result: ctor };
-        var lazyType = {
-          $$typeof: REACT_LAZY_TYPE,
-          _payload: ctor,
-          _init: lazyInitializer
-        }, ioInfo = {
-          name: "lazy",
-          start: -1,
-          end: -1,
-          value: null,
-          owner: null,
-          debugStack: Error("react-stack-top-frame"),
-          debugTask: console.createTask ? console.createTask("lazy()") : null
-        };
-        ctor._ioInfo = ioInfo;
-        lazyType._debugInfo = [{ awaited: ioInfo }];
-        return lazyType;
-      };
-      exports.memo = function(type, compare) {
-        null == type && console.error(
-          "memo: The first argument must be a component. Instead received: %s",
-          null === type ? "null" : typeof type
-        );
-        compare = {
-          $$typeof: REACT_MEMO_TYPE,
-          type,
-          compare: void 0 === compare ? null : compare
-        };
-        var ownName;
-        Object.defineProperty(compare, "displayName", {
-          enumerable: false,
-          configurable: true,
-          get: function() {
-            return ownName;
-          },
-          set: function(name) {
-            ownName = name;
-            type.name || type.displayName || (Object.defineProperty(type, "name", { value: name }), type.displayName = name);
-          }
-        });
-        return compare;
-      };
-      exports.startTransition = startTransition;
-      exports.unstable_useCacheRefresh = function() {
-        return resolveDispatcher().useCacheRefresh();
-      };
-      exports.use = function(usable) {
-        return resolveDispatcher().use(usable);
-      };
-      exports.useActionState = function(action, initialState, permalink) {
-        return resolveDispatcher().useActionState(
-          action,
-          initialState,
-          permalink
-        );
-      };
-      exports.useCallback = function(callback, deps) {
-        return resolveDispatcher().useCallback(callback, deps);
-      };
-      exports.useContext = function(Context) {
-        var dispatcher = resolveDispatcher();
-        Context.$$typeof === REACT_CONSUMER_TYPE && console.error(
-          "Calling useContext(Context.Consumer) is not supported and will cause bugs. Did you mean to call useContext(Context) instead?"
-        );
-        return dispatcher.useContext(Context);
-      };
-      exports.useDebugValue = function(value, formatterFn) {
-        return resolveDispatcher().useDebugValue(value, formatterFn);
-      };
-      exports.useDeferredValue = function(value, initialValue) {
-        return resolveDispatcher().useDeferredValue(value, initialValue);
-      };
-      exports.useEffect = function(create, deps) {
-        null == create && console.warn(
-          "React Hook useEffect requires an effect callback. Did you forget to pass a callback to the hook?"
-        );
-        return resolveDispatcher().useEffect(create, deps);
-      };
-      exports.useEffectEvent = function(callback) {
-        return resolveDispatcher().useEffectEvent(callback);
-      };
-      exports.useId = function() {
-        return resolveDispatcher().useId();
-      };
-      exports.useImperativeHandle = function(ref, create, deps) {
-        return resolveDispatcher().useImperativeHandle(ref, create, deps);
-      };
-      exports.useInsertionEffect = function(create, deps) {
-        null == create && console.warn(
-          "React Hook useInsertionEffect requires an effect callback. Did you forget to pass a callback to the hook?"
-        );
-        return resolveDispatcher().useInsertionEffect(create, deps);
-      };
-      exports.useLayoutEffect = function(create, deps) {
-        null == create && console.warn(
-          "React Hook useLayoutEffect requires an effect callback. Did you forget to pass a callback to the hook?"
-        );
-        return resolveDispatcher().useLayoutEffect(create, deps);
-      };
-      exports.useMemo = function(create, deps) {
-        return resolveDispatcher().useMemo(create, deps);
-      };
-      exports.useOptimistic = function(passthrough, reducer) {
-        return resolveDispatcher().useOptimistic(passthrough, reducer);
-      };
-      exports.useReducer = function(reducer, initialArg, init) {
-        return resolveDispatcher().useReducer(reducer, initialArg, init);
-      };
-      exports.useRef = function(initialValue) {
-        return resolveDispatcher().useRef(initialValue);
-      };
-      exports.useState = function(initialState) {
-        return resolveDispatcher().useState(initialState);
-      };
-      exports.useSyncExternalStore = function(subscribe, getSnapshot, getServerSnapshot) {
-        return resolveDispatcher().useSyncExternalStore(
-          subscribe,
-          getSnapshot,
-          getServerSnapshot
-        );
-      };
-      exports.useTransition = function() {
-        return resolveDispatcher().useTransition();
-      };
-      exports.version = "19.3.1";
-      "undefined" !== typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ && "function" === typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStop && __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStop(Error());
-    })();
-  }
-});
-
-// node_modules/react/index.js
-var require_react = __commonJS({
-  "node_modules/react/index.js"(exports, module) {
-    "use strict";
-    if (false) {
-      module.exports = null;
-    } else {
-      module.exports = require_react_development();
-    }
-  }
-});
-
 // node_modules/react/cjs/react-jsx-runtime.development.js
 var require_react_jsx_runtime_development = __commonJS({
   "node_modules/react/cjs/react-jsx-runtime.development.js"(exports) {
@@ -3623,18 +3623,18 @@ var require_react_jsx_runtime_development = __commonJS({
       function isValidElement(object) {
         return "object" === typeof object && null !== object && object.$$typeof === REACT_ELEMENT_TYPE;
       }
-      var React3 = require_react(), REACT_ELEMENT_TYPE = Symbol.for("react.transitional.element"), REACT_PORTAL_TYPE = Symbol.for("react.portal"), REACT_FRAGMENT_TYPE = Symbol.for("react.fragment"), REACT_STRICT_MODE_TYPE = Symbol.for("react.strict_mode"), REACT_PROFILER_TYPE = Symbol.for("react.profiler"), REACT_CONSUMER_TYPE = Symbol.for("react.consumer"), REACT_CONTEXT_TYPE = Symbol.for("react.context"), REACT_FORWARD_REF_TYPE = Symbol.for("react.forward_ref"), REACT_SUSPENSE_TYPE = Symbol.for("react.suspense"), REACT_SUSPENSE_LIST_TYPE = Symbol.for("react.suspense_list"), REACT_MEMO_TYPE = Symbol.for("react.memo"), REACT_LAZY_TYPE = Symbol.for("react.lazy"), REACT_ACTIVITY_TYPE = Symbol.for("react.activity"), REACT_VIEW_TRANSITION_TYPE = Symbol.for("react.view_transition"), REACT_CLIENT_REFERENCE = Symbol.for("react.client.reference"), ReactSharedInternals = React3.__CLIENT_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE, hasOwnProperty = Object.prototype.hasOwnProperty, isArrayImpl = Array.isArray, createTask = console.createTask ? console.createTask : function() {
+      var React5 = require_react(), REACT_ELEMENT_TYPE = Symbol.for("react.transitional.element"), REACT_PORTAL_TYPE = Symbol.for("react.portal"), REACT_FRAGMENT_TYPE = Symbol.for("react.fragment"), REACT_STRICT_MODE_TYPE = Symbol.for("react.strict_mode"), REACT_PROFILER_TYPE = Symbol.for("react.profiler"), REACT_CONSUMER_TYPE = Symbol.for("react.consumer"), REACT_CONTEXT_TYPE = Symbol.for("react.context"), REACT_FORWARD_REF_TYPE = Symbol.for("react.forward_ref"), REACT_SUSPENSE_TYPE = Symbol.for("react.suspense"), REACT_SUSPENSE_LIST_TYPE = Symbol.for("react.suspense_list"), REACT_MEMO_TYPE = Symbol.for("react.memo"), REACT_LAZY_TYPE = Symbol.for("react.lazy"), REACT_ACTIVITY_TYPE = Symbol.for("react.activity"), REACT_VIEW_TRANSITION_TYPE = Symbol.for("react.view_transition"), REACT_CLIENT_REFERENCE = Symbol.for("react.client.reference"), ReactSharedInternals = React5.__CLIENT_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE, hasOwnProperty = Object.prototype.hasOwnProperty, isArrayImpl = Array.isArray, createTask = console.createTask ? console.createTask : function() {
         return null;
       };
-      React3 = {
+      React5 = {
         react_stack_bottom_frame: function(callStackForError) {
           return callStackForError();
         }
       };
       var specialPropKeyWarningShown;
       var didWarnAboutElementRef = {};
-      var unknownOwnerDebugStack = React3.react_stack_bottom_frame.bind(
-        React3,
+      var unknownOwnerDebugStack = React5.react_stack_bottom_frame.bind(
+        React5,
         UnknownOwner
       )();
       var unknownOwnerDebugTask = createTask(getTaskName(UnknownOwner));
@@ -3691,19 +3691,7 @@ var require_jsx_runtime = __commonJS({
 });
 
 // src/client/samiReactShim.ts
-var getHostReact = () => {
-  const w = typeof window !== "undefined" ? window : {};
-  if (!w.__SamiReact) {
-    throw new Error("Sami host React instance is not initialized yet");
-  }
-  return w.__SamiReact;
-};
-var Fragment = Symbol.for("react.fragment");
-var useState = (initial) => getHostReact().useState(initial);
-var useEffect = (effect, deps) => getHostReact().useEffect(effect, deps);
-var useRef = (initial) => getHostReact().useRef(initial);
-var useCallback = (cb, deps) => getHostReact().useCallback(cb, deps);
-var useMemo = (factory, deps) => getHostReact().useMemo(factory, deps);
+var import_react = __toESM(require_react(), 1);
 
 // src/client/samiCloudUpdater.tsx
 var import_jszip = __toESM(require_jszip_min(), 1);
@@ -3752,15 +3740,15 @@ function SamiChannelMembersModal({
   onClose,
   onMembersUpdated
 }) {
-  const [activeTab, setActiveTab] = useState("members");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedUserIds, setSelectedUserIds] = useState([]);
-  const [members, setMembers] = useState([]);
-  const [allowedIds, setAllowedIds] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [actionLoading, setActionLoading] = useState(false);
-  const [notification, setNotification] = useState(null);
-  useEffect(() => {
+  const [activeTab, setActiveTab] = (0, import_react.useState)("members");
+  const [searchQuery, setSearchQuery] = (0, import_react.useState)("");
+  const [selectedUserIds, setSelectedUserIds] = (0, import_react.useState)([]);
+  const [members, setMembers] = (0, import_react.useState)([]);
+  const [allowedIds, setAllowedIds] = (0, import_react.useState)([]);
+  const [loading, setLoading] = (0, import_react.useState)(false);
+  const [actionLoading, setActionLoading] = (0, import_react.useState)(false);
+  const [notification, setNotification] = (0, import_react.useState)(null);
+  (0, import_react.useEffect)(() => {
     if (!channel) return;
     const initialIds = Array.isArray(channel.allowedMemberIds) ? Array.from(/* @__PURE__ */ new Set([1, ...channel.allowedMemberIds])) : [1];
     setAllowedIds(initialIds);
@@ -3805,7 +3793,7 @@ function SamiChannelMembersModal({
     });
     setMembers(list);
   };
-  useEffect(() => {
+  (0, import_react.useEffect)(() => {
     if (isOpen && channel) {
       fetchMembers();
     }
@@ -3890,7 +3878,7 @@ function SamiChannelMembersModal({
       setActionLoading(false);
     }
   };
-  const availableUsersToAdd = useMemo(() => {
+  const availableUsersToAdd = (0, import_react.useMemo)(() => {
     const q = searchQuery.trim().toLowerCase();
     return allUsers.filter((u) => {
       if (allowedIds.includes(u.id)) return false;
@@ -4198,8 +4186,248 @@ if (typeof window !== "undefined") {
   window.SamiChannelMembersModal = SamiChannelMembersModal;
 }
 
-// src/client/samiCloudUpdater.tsx
+// src/client/samiMessengerExtensions.tsx
 var import_jsx_runtime2 = __toESM(require_jsx_runtime(), 1);
+var SAMI_EMOJIS = ["\u2764\uFE0F", "\u{1F602}", "\u{1F44D}", "\u{1F525}", "\u{1F44F}", "\u{1F62E}"];
+function getActiveAuthHeaders() {
+  const headers = { "Content-Type": "application/json" };
+  try {
+    const raw = localStorage.getItem("sami_active_session") || sessionStorage.getItem("sami_active_session");
+    if (raw) {
+      const u = JSON.parse(raw);
+      if (u && u.id) {
+        headers["x-sami-session"] = encodeURIComponent(
+          JSON.stringify({
+            id: u.id,
+            username: u.username || "",
+            displayName: u.displayName || "",
+            role: u.role || "user",
+            isGuest: !!u.isGuest
+          })
+        );
+        if (u.token) headers.Authorization = `Bearer ${u.token}`;
+      }
+    }
+  } catch {
+  }
+  return headers;
+}
+async function toggleMessageReaction(params) {
+  const headers = getActiveAuthHeaders();
+  let url = "";
+  let body = { emoji: params.emoji };
+  if (params.channelId) {
+    url = `/api/channels/${encodeURIComponent(params.channelId)}/messages/${encodeURIComponent(params.messageId)}/reaction`;
+  } else {
+    url = `/api/private-messages/${encodeURIComponent(params.messageId)}/reaction`;
+    body.conversationId = params.conversationId;
+  }
+  const res = await fetch(url, {
+    method: "POST",
+    headers,
+    body: JSON.stringify(body)
+  });
+  const json = await res.json();
+  if (!res.ok) {
+    throw new Error(json?.error || "\u0641\u0634\u0644 \u062A\u0633\u062C\u064A\u0644 \u0627\u0644\u062A\u0641\u0627\u0639\u0644");
+  }
+  return json.reactions || {};
+}
+async function toggleMessagePin(params) {
+  const headers = getActiveAuthHeaders();
+  let url = "";
+  let body = {};
+  if (params.channelId) {
+    url = `/api/channels/${encodeURIComponent(params.channelId)}/messages/${encodeURIComponent(params.messageId)}/pin`;
+  } else {
+    url = `/api/private-messages/${encodeURIComponent(params.messageId)}/pin`;
+    body.conversationId = params.conversationId;
+  }
+  const res = await fetch(url, {
+    method: "POST",
+    headers,
+    body: JSON.stringify(body)
+  });
+  const json = await res.json();
+  if (!res.ok) {
+    throw new Error(json?.error || "\u0641\u0634\u0644 \u062A\u062B\u0628\u064A\u062A \u0627\u0644\u0631\u0633\u0627\u0644\u0629");
+  }
+  return Boolean(json.pinned);
+}
+function SamiEmojiBar({
+  msg,
+  onClose,
+  channelId,
+  conversationId,
+  onUpdated
+}) {
+  const [isBusy, setIsBusy] = (0, import_react.useState)(false);
+  const handleEmojiClick = async (emoji) => {
+    if (isBusy) return;
+    setIsBusy(true);
+    try {
+      const reactions = await toggleMessageReaction({
+        messageId: msg.id,
+        emoji,
+        channelId,
+        conversationId
+      });
+      msg.reactions = reactions;
+      if (onUpdated) onUpdated(reactions);
+    } catch (err) {
+      console.warn("[Reaction] Error toggling:", err.message);
+    } finally {
+      setIsBusy(false);
+      onClose();
+    }
+  };
+  return /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "sami-emoji-bar", onClick: (e) => e.stopPropagation(), children: SAMI_EMOJIS.map((emoji) => /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+    "button",
+    {
+      type: "button",
+      className: "sami-emoji-btn",
+      disabled: isBusy,
+      onClick: () => handleEmojiClick(emoji),
+      title: `\u062A\u0641\u0627\u0639\u0644 \u0628\u0640 ${emoji}`,
+      children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { children: emoji })
+    },
+    emoji
+  )) });
+}
+function SamiMessageReactions({
+  msg,
+  currentUserId,
+  channelId,
+  conversationId,
+  onUpdated
+}) {
+  const reactions = msg.reactions || {};
+  const entries = Object.entries(reactions).filter(([_, uids]) => Array.isArray(uids) && uids.length > 0);
+  if (entries.length === 0) return null;
+  const handlePillClick = async (emoji, e) => {
+    e.stopPropagation();
+    try {
+      const updated = await toggleMessageReaction({
+        messageId: msg.id,
+        emoji,
+        channelId,
+        conversationId
+      });
+      msg.reactions = updated;
+      if (onUpdated) onUpdated(updated);
+    } catch (err) {
+      console.warn("[Reaction] Error:", err.message);
+    }
+  };
+  return /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "flex flex-wrap items-center gap-1.5 mt-1.5", onClick: (e) => e.stopPropagation(), children: entries.map(([emoji, uids]) => {
+    const isActive = currentUserId && uids.includes(currentUserId);
+    return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(
+      "button",
+      {
+        type: "button",
+        className: `sami-reaction-pill ${isActive ? "is-active" : ""}`,
+        onClick: (e) => handlePillClick(emoji, e),
+        title: `${uids.length} \u062A\u0641\u0627\u0639\u0644`,
+        children: [
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "text-xs", children: emoji }),
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "font-mono text-[10px] font-bold", children: uids.length })
+        ]
+      },
+      emoji
+    );
+  }) });
+}
+function SamiPinButton({
+  msg,
+  currentUser,
+  channelId,
+  conversationId,
+  onClose,
+  onPinToggled
+}) {
+  const isLeaderOrMod = currentUser?.id === 1 || currentUser?.role === "owner" || currentUser?.role === "moderator" || Boolean(conversationId);
+  if (!isLeaderOrMod) return null;
+  const isPinned = Boolean(msg.isPinned);
+  const handleTogglePin = async () => {
+    try {
+      const nextPinned = await toggleMessagePin({
+        messageId: msg.id,
+        channelId,
+        conversationId
+      });
+      msg.isPinned = nextPinned;
+      if (onPinToggled) onPinToggled(nextPinned);
+    } catch (err) {
+      console.warn("[Pin] Error:", err.message);
+    } finally {
+      onClose();
+    }
+  };
+  return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(
+    "button",
+    {
+      type: "button",
+      onClick: handleTogglePin,
+      className: "w-full px-3 py-2 rounded-xl text-xs font-bold text-slate-100 hover:text-amber-300 hover:bg-amber-500/15 flex items-center gap-2.5 transition border-t border-slate-800/80 mt-1",
+      children: [
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "text-amber-400", children: "\u{1F4CC}" }),
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { children: isPinned ? "\u0625\u0644\u063A\u0627\u0621 \u062A\u062B\u0628\u064A\u062A \u0627\u0644\u0631\u0633\u0627\u0644\u0629" : "\u062A\u062B\u0628\u064A\u062A \u0627\u0644\u0631\u0633\u0627\u0644\u0629 \u0641\u064A \u0627\u0644\u0623\u0639\u0644\u0649" })
+      ]
+    }
+  );
+}
+function SamiPinnedBanner({
+  pinnedMsg,
+  onJump,
+  onUnpin,
+  canUnpin
+}) {
+  if (!pinnedMsg) return null;
+  return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(
+    "div",
+    {
+      className: "sami-pinned-bar px-3 py-1.5 flex items-center justify-between gap-2 text-xs cursor-pointer select-none",
+      onClick: onJump,
+      children: [
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "flex items-center gap-2 min-w-0", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "text-amber-400 text-sm shrink-0", children: "\u{1F4CC}" }),
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "min-w-0", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("span", { className: "font-bold text-amber-300 ml-1.5", children: [
+              pinnedMsg.senderName,
+              ":"
+            ] }),
+            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "text-slate-200 truncate", children: pinnedMsg.text || "\u0645\u0631\u0641\u0642 \u0648\u0633\u0627\u0626\u0637" })
+          ] })
+        ] }),
+        canUnpin && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+          "button",
+          {
+            type: "button",
+            onClick: (e) => {
+              e.stopPropagation();
+              onUnpin();
+            },
+            className: "text-slate-400 hover:text-white p-1 rounded-md text-xs font-bold",
+            title: "\u0625\u0644\u063A\u0627\u0621 \u0627\u0644\u062A\u062B\u0628\u064A\u062A",
+            children: "\u2715"
+          }
+        )
+      ]
+    }
+  );
+}
+if (typeof window !== "undefined") {
+  const w = window;
+  w.SamiEmojiBar = SamiEmojiBar;
+  w.SamiMessageReactions = SamiMessageReactions;
+  w.SamiPinButton = SamiPinButton;
+  w.SamiPinnedBanner = SamiPinnedBanner;
+  w.samiToggleReaction = toggleMessageReaction;
+  w.samiTogglePin = toggleMessagePin;
+}
+
+// src/client/samiCloudUpdater.tsx
+var import_jsx_runtime3 = __toESM(require_jsx_runtime(), 1);
 if (typeof window !== "undefined" && window.Storage) {
   try {
     const originalSetItem = Storage.prototype.setItem;
@@ -4798,9 +5026,9 @@ function GoldProgressBar({
 }) {
   const clamped = Math.max(0, Math.min(100, Math.round(percent || 0)));
   const fillClass = variant === "emerald" ? "fill-emerald-400" : variant === "rose" ? "fill-rose-500" : "fill-amber-400";
-  return /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { dir: "ltr", className: "w-full rounded-lg overflow-hidden bg-[#070a12] border border-slate-800 p-0.5", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("svg", { viewBox: "0 0 100 4", preserveAspectRatio: "none", className: "w-full h-2.5 block rounded", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("rect", { x: "0", y: "0", width: "100", height: "4", className: "fill-slate-900" }),
-    clamped > 0 && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("rect", { x: "0", y: "0", width: clamped, height: "4", className: `${fillClass} transition-all duration-150` })
+  return /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { dir: "ltr", className: "w-full rounded-lg overflow-hidden bg-[#070a12] border border-slate-800 p-0.5", children: /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("svg", { viewBox: "0 0 100 4", preserveAspectRatio: "none", className: "w-full h-2.5 block rounded", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("rect", { x: "0", y: "0", width: "100", height: "4", className: "fill-slate-900" }),
+    clamped > 0 && /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("rect", { x: "0", y: "0", width: clamped, height: "4", className: `${fillClass} transition-all duration-150` })
   ] }) });
 }
 var webDownloadMemoryStore = {
@@ -5058,10 +5286,10 @@ function SamiUserUpdateModal({
   onDismiss,
   isPreview = false
 }) {
-  const [currentInstalledInfo, setCurrentInstalledInfo] = useState(() => getInstalledSamiAppInfo());
+  const [currentInstalledInfo, setCurrentInstalledInfo] = (0, import_react.useState)(() => getInstalledSamiAppInfo());
   const isNativeAndroid = currentInstalledInfo.isAndroidNative;
-  const [externalOpened, setExternalOpened] = useState(false);
-  const [dlState, setDlState] = useState(() => {
+  const [externalOpened, setExternalOpened] = (0, import_react.useState)(false);
+  const [dlState, setDlState] = (0, import_react.useState)(() => {
     const w = typeof window !== "undefined" ? window : {};
     if (isNativeAndroid && w.SamiBridge && typeof w.SamiBridge.getUpdateState === "function") {
       try {
@@ -5091,8 +5319,8 @@ function SamiUserUpdateModal({
       verifiedSigningCertSha256: null
     };
   });
-  const [webInstallNotice, setWebInstallNotice] = useState(null);
-  useEffect(() => {
+  const [webInstallNotice, setWebInstallNotice] = (0, import_react.useState)(null);
+  (0, import_react.useEffect)(() => {
     if (!isOpen || !config) return;
     const checkInstalledVersion = () => {
       const info = getInstalledSamiAppInfo();
@@ -5119,7 +5347,7 @@ function SamiUserUpdateModal({
       };
     }
   }, [isOpen, config, onDismiss]);
-  useEffect(() => {
+  (0, import_react.useEffect)(() => {
     if (!isOpen || !config) return;
     const w = typeof window !== "undefined" ? window : {};
     if (isNativeAndroid) {
@@ -5301,21 +5529,21 @@ function SamiUserUpdateModal({
     }
   };
   const totalSizeDisplay = dlState.totalBytes > 0 ? dlState.totalBytes : config.fileSize || 0;
-  return /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+  return /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
     "div",
     {
       dir: "rtl",
       className: "fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-md p-4 animate-in fade-in duration-200",
-      children: /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "relative w-full max-w-md bg-[#090d17] border border-amber-500/40 rounded-2xl p-6 shadow-2xl text-right space-y-4", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "flex items-start justify-between gap-3 border-b border-slate-800/80 pb-4", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "flex items-center gap-3", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "w-12 h-12 rounded-xl bg-amber-400/15 border border-amber-400/40 flex items-center justify-center text-amber-400 shrink-0 font-black text-lg", children: isMandatory ? "\u26A1" : "\u2726" }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { children: [
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("h3", { className: "text-base font-black text-white", children: isMandatory ? "\u062A\u062D\u062F\u064A\u062B \u0625\u0644\u0632\u0627\u0645\u064A \u0644\u062A\u0637\u0628\u064A\u0642 Sami" : "\u062A\u062D\u062F\u064A\u062B \u062C\u062F\u064A\u062F \u0645\u062A\u0627\u062D \u0644\u062A\u0637\u0628\u064A\u0642 Sami" }),
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("p", { className: "text-xs font-bold mt-0.5 text-amber-300/90", children: isMandatory ? "\u064A\u0644\u0632\u0645 \u062A\u062B\u0628\u064A\u062A \u0647\u0630\u0627 \u0627\u0644\u062A\u062D\u062F\u064A\u062B \u0644\u0644\u0645\u062A\u0627\u0628\u0639\u0629 \u0648\u0636\u0645\u0627\u0646 \u0627\u0633\u062A\u0642\u0631\u0627\u0631 \u0627\u0644\u062D\u0633\u0627\u0628 \u0648\u0627\u0644\u0628\u064A\u0627\u0646\u0627\u062A" : isExternalDelivery ? "\u0631\u0627\u0628\u0637 \u062A\u062D\u0645\u064A\u0644 \u0631\u0633\u0645\u064A \u0645\u062A\u0627\u062D \u0644\u0644\u062A\u062D\u0645\u064A\u0644 \u0648\u0627\u0644\u062A\u062B\u0628\u064A\u062A \u0627\u0644\u0645\u0628\u0627\u0634\u0631" : "\u0625\u0635\u062F\u0627\u0631 \u0645\u062D\u062F\u062B \u062C\u0627\u0647\u0632 \u0644\u0644\u062A\u0646\u0632\u064A\u0644 \u0648\u0627\u0644\u062A\u062B\u0628\u064A\u062A \u0627\u0644\u0645\u0628\u0627\u0634\u0631 \u0645\u0646 \u062F\u0627\u062E\u0644 \u0627\u0644\u062A\u0637\u0628\u064A\u0642" })
+      children: /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "relative w-full max-w-md bg-[#090d17] border border-amber-500/40 rounded-2xl p-6 shadow-2xl text-right space-y-4", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex items-start justify-between gap-3 border-b border-slate-800/80 pb-4", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex items-center gap-3", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "w-12 h-12 rounded-xl bg-amber-400/15 border border-amber-400/40 flex items-center justify-center text-amber-400 shrink-0 font-black text-lg", children: isMandatory ? "\u26A1" : "\u2726" }),
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { children: [
+              /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("h3", { className: "text-base font-black text-white", children: isMandatory ? "\u062A\u062D\u062F\u064A\u062B \u0625\u0644\u0632\u0627\u0645\u064A \u0644\u062A\u0637\u0628\u064A\u0642 Sami" : "\u062A\u062D\u062F\u064A\u062B \u062C\u062F\u064A\u062F \u0645\u062A\u0627\u062D \u0644\u062A\u0637\u0628\u064A\u0642 Sami" }),
+              /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("p", { className: "text-xs font-bold mt-0.5 text-amber-300/90", children: isMandatory ? "\u064A\u0644\u0632\u0645 \u062A\u062B\u0628\u064A\u062A \u0647\u0630\u0627 \u0627\u0644\u062A\u062D\u062F\u064A\u062B \u0644\u0644\u0645\u062A\u0627\u0628\u0639\u0629 \u0648\u0636\u0645\u0627\u0646 \u0627\u0633\u062A\u0642\u0631\u0627\u0631 \u0627\u0644\u062D\u0633\u0627\u0628 \u0648\u0627\u0644\u0628\u064A\u0627\u0646\u0627\u062A" : isExternalDelivery ? "\u0631\u0627\u0628\u0637 \u062A\u062D\u0645\u064A\u0644 \u0631\u0633\u0645\u064A \u0645\u062A\u0627\u062D \u0644\u0644\u062A\u062D\u0645\u064A\u0644 \u0648\u0627\u0644\u062A\u062B\u0628\u064A\u062A \u0627\u0644\u0645\u0628\u0627\u0634\u0631" : "\u0625\u0635\u062F\u0627\u0631 \u0645\u062D\u062F\u062B \u062C\u0627\u0647\u0632 \u0644\u0644\u062A\u0646\u0632\u064A\u0644 \u0648\u0627\u0644\u062A\u062B\u0628\u064A\u062A \u0627\u0644\u0645\u0628\u0627\u0634\u0631 \u0645\u0646 \u062F\u0627\u062E\u0644 \u0627\u0644\u062A\u0637\u0628\u064A\u0642" })
             ] })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
             "span",
             {
               className: `text-[10px] font-black px-2.5 py-1 rounded-md border shrink-0 ${isMandatory ? "bg-rose-500/15 border-rose-500/40 text-rose-300" : "bg-amber-400/10 border-amber-400/30 text-amber-300"}`,
@@ -5323,10 +5551,10 @@ function SamiUserUpdateModal({
             }
           )
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "grid grid-cols-3 gap-2 bg-[#0d1322] border border-slate-800 rounded-xl p-3 text-center", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "border-l border-slate-800/80 pl-2", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "block text-[10px] text-slate-400 font-bold", children: "\u0627\u0644\u0625\u0635\u062F\u0627\u0631 \u0627\u0644\u0645\u062B\u0628\u062A" }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(
+        /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "grid grid-cols-3 gap-2 bg-[#0d1322] border border-slate-800 rounded-xl p-3 text-center", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "border-l border-slate-800/80 pl-2", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "block text-[10px] text-slate-400 font-bold", children: "\u0627\u0644\u0625\u0635\u062F\u0627\u0631 \u0627\u0644\u0645\u062B\u0628\u062A" }),
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(
               "span",
               {
                 dir: "ltr",
@@ -5337,14 +5565,14 @@ function SamiUserUpdateModal({
                 ]
               }
             ),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("span", { className: "block text-[10px] text-slate-500 font-['JetBrains_Mono',monospace] tabular-nums", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("span", { className: "block text-[10px] text-slate-500 font-['JetBrains_Mono',monospace] tabular-nums", children: [
               "Build ",
               currentInstalledInfo.versionCode
             ] })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "border-l border-slate-800/80 pl-2", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "block text-[10px] text-amber-400 font-bold", children: "\u0627\u0644\u0625\u0635\u062F\u0627\u0631 \u0627\u0644\u062C\u062F\u064A\u062F" }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "border-l border-slate-800/80 pl-2", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "block text-[10px] text-amber-400 font-bold", children: "\u0627\u0644\u0625\u0635\u062F\u0627\u0631 \u0627\u0644\u062C\u062F\u064A\u062F" }),
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(
               "span",
               {
                 dir: "ltr",
@@ -5355,34 +5583,34 @@ function SamiUserUpdateModal({
                 ]
               }
             ),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("span", { className: "block text-[10px] text-amber-200/70 font-['JetBrains_Mono',monospace] tabular-nums", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("span", { className: "block text-[10px] text-amber-200/70 font-['JetBrains_Mono',monospace] tabular-nums", children: [
               "Build ",
               config.versionCode
             ] })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { children: [
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "block text-[10px] text-slate-400 font-bold", children: "\u0646\u0648\u0639 \u0627\u0644\u062A\u0648\u0632\u064A\u0639" }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { children: [
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "block text-[10px] text-slate-400 font-bold", children: "\u0646\u0648\u0639 \u0627\u0644\u062A\u0648\u0632\u064A\u0639" }),
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
               "span",
               {
                 className: "block text-xs font-black text-slate-100 mt-0.5",
                 children: isExternalDelivery ? "\u0631\u0627\u0628\u0637 APK \u062E\u0627\u0631\u062C\u064A" : totalSizeDisplay > 0 ? formatBytesAr(totalSizeDisplay) : "APK \u0631\u0633\u0645\u064A"
               }
             ),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "block text-[10px] text-emerald-400 font-bold", children: "\u0645\u0648\u0642\u0651\u0639 \u0648\u0645\u0648\u062B\u0651\u0642" })
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "block text-[10px] text-emerald-400 font-bold", children: "\u0645\u0648\u0642\u0651\u0639 \u0648\u0645\u0648\u062B\u0651\u0642" })
           ] })
         ] }),
-        config.description && /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "bg-[#0b0f19] border border-slate-800/90 rounded-xl p-3.5", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "block text-[11px] font-black text-amber-400 mb-1.5", children: "\u062A\u0641\u0627\u0635\u064A\u0644 \u0627\u0644\u062A\u062D\u062F\u064A\u062B \u0648\u0645\u0627 \u0627\u0644\u062C\u062F\u064A\u062F:" }),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("p", { className: "text-xs text-slate-300 leading-relaxed max-h-32 overflow-y-auto whitespace-pre-wrap", children: config.description })
+        config.description && /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "bg-[#0b0f19] border border-slate-800/90 rounded-xl p-3.5", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "block text-[11px] font-black text-amber-400 mb-1.5", children: "\u062A\u0641\u0627\u0635\u064A\u0644 \u0627\u0644\u062A\u062D\u062F\u064A\u062B \u0648\u0645\u0627 \u0627\u0644\u062C\u062F\u064A\u062F:" }),
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("p", { className: "text-xs text-slate-300 leading-relaxed max-h-32 overflow-y-auto whitespace-pre-wrap", children: config.description })
         ] }),
-        externalOpened && /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "bg-amber-400/10 border border-amber-400/30 rounded-xl p-3.5 text-xs space-y-2", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "font-bold text-amber-300 flex items-center gap-1.5", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { children: "\u{1F310}" }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { children: "\u062A\u0645 \u0641\u062A\u062D \u0631\u0627\u0628\u0637 \u0627\u0644\u062A\u0646\u0632\u064A\u0644 \u0641\u064A \u0645\u062A\u0635\u0641\u062D \u0627\u0644\u0646\u0638\u0627\u0645" })
+        externalOpened && /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "bg-amber-400/10 border border-amber-400/30 rounded-xl p-3.5 text-xs space-y-2", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "font-bold text-amber-300 flex items-center gap-1.5", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { children: "\u{1F310}" }),
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { children: "\u062A\u0645 \u0641\u062A\u062D \u0631\u0627\u0628\u0637 \u0627\u0644\u062A\u0646\u0632\u064A\u0644 \u0641\u064A \u0645\u062A\u0635\u0641\u062D \u0627\u0644\u0646\u0638\u0627\u0645" })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("p", { className: "text-[11px] text-slate-300 leading-relaxed", children: "\u0642\u0645 \u0628\u062A\u062D\u0645\u064A\u0644 \u062D\u0632\u0645\u0629 \u0627\u0644\u0640 APK \u0648\u062A\u062B\u0628\u064A\u062A\u0647\u0627. \u0639\u0646\u062F \u0627\u0644\u0639\u0648\u062F\u0629 \u0625\u0644\u0649 \u062A\u0637\u0628\u064A\u0642 Sami \u0628\u0639\u062F \u0627\u0643\u062A\u0645\u0627\u0644 \u0627\u0644\u062A\u062B\u0628\u064A\u062A\u060C \u0633\u064A\u0643\u062A\u0634\u0641 \u0627\u0644\u062A\u0637\u0628\u064A\u0642 \u0631\u0642\u0645 \u0627\u0644\u0625\u0635\u062F\u0627\u0631 \u0627\u0644\u062C\u062F\u064A\u062F \u062A\u0644\u0642\u0627\u0626\u064A\u0627\u064B \u0648\u064A\u063A\u0644\u0642 \u0647\u0630\u0647 \u0627\u0644\u0646\u0627\u0641\u0630\u0629 \u0641\u0648\u0631\u0627\u064B." }),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("p", { className: "text-[11px] text-slate-300 leading-relaxed", children: "\u0642\u0645 \u0628\u062A\u062D\u0645\u064A\u0644 \u062D\u0632\u0645\u0629 \u0627\u0644\u0640 APK \u0648\u062A\u062B\u0628\u064A\u062A\u0647\u0627. \u0639\u0646\u062F \u0627\u0644\u0639\u0648\u062F\u0629 \u0625\u0644\u0649 \u062A\u0637\u0628\u064A\u0642 Sami \u0628\u0639\u062F \u0627\u0643\u062A\u0645\u0627\u0644 \u0627\u0644\u062A\u062B\u0628\u064A\u062A\u060C \u0633\u064A\u0643\u062A\u0634\u0641 \u0627\u0644\u062A\u0637\u0628\u064A\u0642 \u0631\u0642\u0645 \u0627\u0644\u0625\u0635\u062F\u0627\u0631 \u0627\u0644\u062C\u062F\u064A\u062F \u062A\u0644\u0642\u0627\u0626\u064A\u0627\u064B \u0648\u064A\u063A\u0644\u0642 \u0647\u0630\u0647 \u0627\u0644\u0646\u0627\u0641\u0630\u0629 \u0641\u0648\u0631\u0627\u064B." }),
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
             "button",
             {
               type: "button",
@@ -5392,16 +5620,16 @@ function SamiUserUpdateModal({
             }
           )
         ] }),
-        !isExternalDelivery && phase !== "idle" && /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "bg-[#0b101d] border border-slate-800 rounded-xl p-3.5 space-y-2.5", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "flex items-center justify-between gap-2 text-xs", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+        !isExternalDelivery && phase !== "idle" && /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "bg-[#0b101d] border border-slate-800 rounded-xl p-3.5 space-y-2.5", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex items-center justify-between gap-2 text-xs", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
               "span",
               {
                 className: `font-black ${isFailed ? "text-rose-400" : isVerifiedReady ? "text-emerald-400" : "text-amber-300"}`,
                 children: dlState.statusTextAr || "\u062C\u0627\u0631\u064D \u0645\u0639\u0627\u0644\u062C\u0629 \u0627\u0644\u062A\u062D\u062F\u064A\u062B"
               }
             ),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(
               "span",
               {
                 dir: "ltr",
@@ -5413,47 +5641,47 @@ function SamiUserUpdateModal({
               }
             )
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
             GoldProgressBar,
             {
               percent: dlState.percent,
               variant: isFailed ? "rose" : isVerifiedReady ? "emerald" : "gold"
             }
           ),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "flex items-center justify-between text-[11px] text-slate-400 font-['JetBrains_Mono',monospace] tabular-nums", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("span", { dir: "ltr", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex items-center justify-between text-[11px] text-slate-400 font-['JetBrains_Mono',monospace] tabular-nums", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("span", { dir: "ltr", children: [
               formatBytesAr(dlState.downloadedBytes),
               " / ",
               formatBytesAr(totalSizeDisplay)
             ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { dir: "ltr", className: "text-amber-300", children: isDownloading && dlState.speedBytesPerSec > 0 ? formatSpeedAr(dlState.speedBytesPerSec) : "" })
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { dir: "ltr", className: "text-amber-300", children: isDownloading && dlState.speedBytesPerSec > 0 ? formatSpeedAr(dlState.speedBytesPerSec) : "" })
           ] }),
-          isVerifiedReady && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-2.5 text-[11px] text-emerald-300 font-bold", children: "\u2713 \u062A\u0645 \u0627\u0644\u062A\u062D\u0642\u0642 \u0645\u0646 \u0627\u0643\u062A\u0645\u0627\u0644 \u0627\u0644\u062D\u062C\u0645 \u0648\u0628\u0635\u0645\u0629 SHA-256 \u0648\u0645\u0637\u0627\u0628\u0642\u0629 \u0634\u0647\u0627\u062F\u0629 \u062A\u0648\u0642\u064A\u0639 Sami \u0627\u0644\u0623\u0635\u0644\u064A\u0629 \u0628\u0646\u062C\u0627\u062D." }),
-          needsPerm && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "bg-amber-400/10 border border-amber-400/30 rounded-lg p-2.5 text-[11px] text-amber-200 font-bold", children: "\u064A\u0631\u062C\u0649 \u062A\u0641\u0639\u064A\u0644 \u062E\u064A\u0627\u0631 \xAB\u0627\u0644\u0633\u0645\u0627\u062D \u0645\u0646 \u0647\u0630\u0627 \u0627\u0644\u0645\u0635\u062F\u0631\xBB \u0641\u064A \u0634\u0627\u0634\u0629 \u0625\u0639\u062F\u0627\u062F\u0627\u062A Android \u062B\u0645 \u0627\u0644\u0639\u0648\u062F\u0629 \u0644\u0625\u062A\u0645\u0627\u0645 \u0627\u0644\u062A\u062B\u0628\u064A\u062A \u062A\u0644\u0642\u0627\u0626\u064A\u0627\u064B." }),
-          dlState.errorDetailAr && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "bg-rose-500/10 border border-rose-500/30 rounded-lg p-2.5 text-[11px] text-rose-300 leading-relaxed", children: dlState.errorDetailAr }),
-          webInstallNotice && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "bg-amber-400/10 border border-amber-400/30 rounded-lg p-2.5 text-[11px] text-amber-200 leading-relaxed", children: webInstallNotice })
+          isVerifiedReady && /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-2.5 text-[11px] text-emerald-300 font-bold", children: "\u2713 \u062A\u0645 \u0627\u0644\u062A\u062D\u0642\u0642 \u0645\u0646 \u0627\u0643\u062A\u0645\u0627\u0644 \u0627\u0644\u062D\u062C\u0645 \u0648\u0628\u0635\u0645\u0629 SHA-256 \u0648\u0645\u0637\u0627\u0628\u0642\u0629 \u0634\u0647\u0627\u062F\u0629 \u062A\u0648\u0642\u064A\u0639 Sami \u0627\u0644\u0623\u0635\u0644\u064A\u0629 \u0628\u0646\u062C\u0627\u062D." }),
+          needsPerm && /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "bg-amber-400/10 border border-amber-400/30 rounded-lg p-2.5 text-[11px] text-amber-200 font-bold", children: "\u064A\u0631\u062C\u0649 \u062A\u0641\u0639\u064A\u0644 \u062E\u064A\u0627\u0631 \xAB\u0627\u0644\u0633\u0645\u0627\u062D \u0645\u0646 \u0647\u0630\u0627 \u0627\u0644\u0645\u0635\u062F\u0631\xBB \u0641\u064A \u0634\u0627\u0634\u0629 \u0625\u0639\u062F\u0627\u062F\u0627\u062A Android \u062B\u0645 \u0627\u0644\u0639\u0648\u062F\u0629 \u0644\u0625\u062A\u0645\u0627\u0645 \u0627\u0644\u062A\u062B\u0628\u064A\u062A \u062A\u0644\u0642\u0627\u0626\u064A\u0627\u064B." }),
+          dlState.errorDetailAr && /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "bg-rose-500/10 border border-rose-500/30 rounded-lg p-2.5 text-[11px] text-rose-300 leading-relaxed", children: dlState.errorDetailAr }),
+          webInstallNotice && /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "bg-amber-400/10 border border-amber-400/30 rounded-lg p-2.5 text-[11px] text-amber-200 leading-relaxed", children: webInstallNotice })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "space-y-2 pt-1", children: [
-          !isExternalDelivery && (isVerifiedReady || needsPerm || isInstalling) && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+        /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "space-y-2 pt-1", children: [
+          !isExternalDelivery && (isVerifiedReady || needsPerm || isInstalling) && /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
             "button",
             {
               type: "button",
               onClick: handleInstallVerifiedApk,
               className: "w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-slate-950 font-black text-xs flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20 transition cursor-pointer",
-              children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { children: "\u2705 \u062A\u062B\u0628\u064A\u062A \u0627\u0644\u062A\u062D\u062F\u064A\u062B \u0627\u0644\u0622\u0646" })
+              children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { children: "\u2705 \u062A\u062B\u0628\u064A\u062A \u0627\u0644\u062A\u062D\u062F\u064A\u062B \u0627\u0644\u0622\u0646" })
             }
           ),
-          (isExternalDelivery || phase === "idle") && (!isVerifiedReady && !needsPerm && !isInstalling) && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+          (isExternalDelivery || phase === "idle") && (!isVerifiedReady && !needsPerm && !isInstalling) && /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
             "button",
             {
               type: "button",
               onClick: handleStartDownload,
               className: "w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-slate-950 font-black text-xs flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20 transition cursor-pointer",
-              children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { children: isExternalDelivery ? "\u062A\u062D\u0645\u064A\u0644 \u0627\u0644\u062A\u062D\u062F\u064A\u062B \u0645\u0646 \u0627\u0644\u0631\u0627\u0628\u0637 \u0627\u0644\u062E\u0627\u0631\u062C\u064A \u{1F310}" : "\u062A\u062D\u0645\u064A\u0644 \u0627\u0644\u062A\u062D\u062F\u064A\u062B \u0627\u0644\u0622\u0646" })
+              children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { children: isExternalDelivery ? "\u062A\u062D\u0645\u064A\u0644 \u0627\u0644\u062A\u062D\u062F\u064A\u062B \u0645\u0646 \u0627\u0644\u0631\u0627\u0628\u0637 \u0627\u0644\u062E\u0627\u0631\u062C\u064A \u{1F310}" : "\u062A\u062D\u0645\u064A\u0644 \u0627\u0644\u062A\u062D\u062F\u064A\u062B \u0627\u0644\u0622\u0646" })
             }
           ),
-          !isExternalDelivery && isDownloading && phase !== "verifying" && /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "flex items-center gap-2", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+          !isExternalDelivery && isDownloading && phase !== "verifying" && /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex items-center gap-2", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
               "button",
               {
                 type: "button",
@@ -5462,7 +5690,7 @@ function SamiUserUpdateModal({
                 children: "\u0625\u064A\u0642\u0627\u0641 \u0645\u0624\u0642\u062A"
               }
             ),
-            !isMandatory && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+            !isMandatory && /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
               "button",
               {
                 type: "button",
@@ -5472,8 +5700,8 @@ function SamiUserUpdateModal({
               }
             )
           ] }),
-          !isExternalDelivery && (isPaused || isFailed) && /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "flex items-center gap-2", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+          !isExternalDelivery && (isPaused || isFailed) && /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex items-center gap-2", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
               "button",
               {
                 type: "button",
@@ -5482,7 +5710,7 @@ function SamiUserUpdateModal({
                 children: dlState.canResume ? "\u0627\u0633\u062A\u0626\u0646\u0627\u0641 \u0627\u0644\u062A\u0646\u0632\u064A\u0644" : "\u0625\u0639\u0627\u062F\u0629 \u0627\u0644\u0645\u062D\u0627\u0648\u0644\u0629"
               }
             ),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
               "button",
               {
                 type: "button",
@@ -5492,7 +5720,7 @@ function SamiUserUpdateModal({
               }
             )
           ] }),
-          !isMandatory && onDismiss && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+          !isMandatory && onDismiss && /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
             "button",
             {
               type: "button",
@@ -5510,71 +5738,71 @@ function SamiAdminUpdatePanel({
   currentUser,
   onToast
 }) {
-  const onToastRef = useRef(onToast);
+  const onToastRef = (0, import_react.useRef)(onToast);
   onToastRef.current = onToast;
-  const notify = useCallback((msg, isError = false) => {
+  const notify = (0, import_react.useCallback)((msg, isError = false) => {
     if (onToastRef.current) onToastRef.current(msg, isError);
   }, []);
-  const fileInputRef = useRef(null);
-  const activeXhrRef = useRef(null);
-  const pollTimerRef = useRef(null);
-  const unmountAbortRef = useRef(null);
-  const inFlightBootstrapRef = useRef(false);
-  const mountedRef = useRef(true);
-  const [loadingStatus, setLoadingStatus] = useState(true);
-  const [connectionState, setConnectionState] = useState(
+  const fileInputRef = (0, import_react.useRef)(null);
+  const activeXhrRef = (0, import_react.useRef)(null);
+  const pollTimerRef = (0, import_react.useRef)(null);
+  const unmountAbortRef = (0, import_react.useRef)(null);
+  const inFlightBootstrapRef = (0, import_react.useRef)(false);
+  const mountedRef = (0, import_react.useRef)(true);
+  const [loadingStatus, setLoadingStatus] = (0, import_react.useState)(true);
+  const [connectionState, setConnectionState] = (0, import_react.useState)(
     "connecting"
   );
-  const [connectionErrorAr, setConnectionErrorAr] = useState(null);
-  const [githubStatus, setGithubStatus] = useState(null);
-  const [vaultInfo, setVaultInfo] = useState(null);
-  const [signingKeyInfo, setSigningKeyInfo] = useState(null);
-  const [currentPublished, setCurrentPublished] = useState(null);
-  const [effectiveMinVersionCode, setEffectiveMinVersionCode] = useState(SAMI_FALLBACK_VERSION_CODE);
-  const [historyList, setHistoryList] = useState([]);
-  const [globalDistributionEnabled, setGlobalDistributionEnabled] = useState(true);
-  const [togglingGlobal, setTogglingGlobal] = useState(false);
-  const [publishTab, setPublishTab] = useState("github");
-  const [extVersionName, setExtVersionName] = useState("");
-  const [extVersionCode, setExtVersionCode] = useState("");
-  const [extDownloadUrl, setExtDownloadUrl] = useState("");
-  const [extTitle, setExtTitle] = useState("");
-  const [extDescription, setExtDescription] = useState("");
-  const [extIsMandatory, setExtIsMandatory] = useState(false);
-  const [extDistributionStatus, setExtDistributionStatus] = useState("enabled");
-  const [extPublishing, setExtPublishing] = useState(false);
-  const [togglingUpdateId, setTogglingUpdateId] = useState(null);
-  const [editingUrlItem, setEditingUrlItem] = useState(null);
-  const [newUrlInput, setNewUrlInput] = useState("");
-  const [savingUrl, setSavingUrl] = useState(false);
-  const settingsInitializedRef = useRef(false);
-  const [settingsOpen, setSettingsOpen] = useState(false);
-  const [ownerInput, setOwnerInput] = useState("");
-  const [repoInput, setRepoInput] = useState("");
-  const [tokenInput, setTokenInput] = useState("");
-  const [showToken, setShowToken] = useState(false);
-  const [savingSettings, setSavingSettings] = useState(false);
-  const [testingConnection, setTestingConnection] = useState(false);
-  const [settingsFeedback, setSettingsFeedback] = useState(null);
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [inspectingFile, setInspectingFile] = useState(false);
-  const [inspection, setInspection] = useState(null);
-  const [localError, setLocalError] = useState(null);
-  const [description, setDescription] = useState("");
-  const [isMandatory, setIsMandatory] = useState(false);
-  const [uploading, setUploading] = useState(false);
-  const [uploadPercent, setUploadPercent] = useState(0);
-  const [uploadedBytes, setUploadedBytes] = useState(0);
-  const [uploadTotalBytes, setUploadTotalBytes] = useState(0);
-  const [uploadSpeedBps, setUploadSpeedBps] = useState(0);
-  const [uploadPhaseText, setUploadPhaseText] = useState("");
-  const [uploadError, setUploadError] = useState(null);
-  const [uploadSuccessInfo, setUploadSuccessInfo] = useState(null);
-  const [actionBusy, setActionBusy] = useState(false);
-  const [showPreviewModal, setShowPreviewModal] = useState(false);
+  const [connectionErrorAr, setConnectionErrorAr] = (0, import_react.useState)(null);
+  const [githubStatus, setGithubStatus] = (0, import_react.useState)(null);
+  const [vaultInfo, setVaultInfo] = (0, import_react.useState)(null);
+  const [signingKeyInfo, setSigningKeyInfo] = (0, import_react.useState)(null);
+  const [currentPublished, setCurrentPublished] = (0, import_react.useState)(null);
+  const [effectiveMinVersionCode, setEffectiveMinVersionCode] = (0, import_react.useState)(SAMI_FALLBACK_VERSION_CODE);
+  const [historyList, setHistoryList] = (0, import_react.useState)([]);
+  const [globalDistributionEnabled, setGlobalDistributionEnabled] = (0, import_react.useState)(true);
+  const [togglingGlobal, setTogglingGlobal] = (0, import_react.useState)(false);
+  const [publishTab, setPublishTab] = (0, import_react.useState)("github");
+  const [extVersionName, setExtVersionName] = (0, import_react.useState)("");
+  const [extVersionCode, setExtVersionCode] = (0, import_react.useState)("");
+  const [extDownloadUrl, setExtDownloadUrl] = (0, import_react.useState)("");
+  const [extTitle, setExtTitle] = (0, import_react.useState)("");
+  const [extDescription, setExtDescription] = (0, import_react.useState)("");
+  const [extIsMandatory, setExtIsMandatory] = (0, import_react.useState)(false);
+  const [extDistributionStatus, setExtDistributionStatus] = (0, import_react.useState)("enabled");
+  const [extPublishing, setExtPublishing] = (0, import_react.useState)(false);
+  const [togglingUpdateId, setTogglingUpdateId] = (0, import_react.useState)(null);
+  const [editingUrlItem, setEditingUrlItem] = (0, import_react.useState)(null);
+  const [newUrlInput, setNewUrlInput] = (0, import_react.useState)("");
+  const [savingUrl, setSavingUrl] = (0, import_react.useState)(false);
+  const settingsInitializedRef = (0, import_react.useRef)(false);
+  const [settingsOpen, setSettingsOpen] = (0, import_react.useState)(false);
+  const [ownerInput, setOwnerInput] = (0, import_react.useState)("");
+  const [repoInput, setRepoInput] = (0, import_react.useState)("");
+  const [tokenInput, setTokenInput] = (0, import_react.useState)("");
+  const [showToken, setShowToken] = (0, import_react.useState)(false);
+  const [savingSettings, setSavingSettings] = (0, import_react.useState)(false);
+  const [testingConnection, setTestingConnection] = (0, import_react.useState)(false);
+  const [settingsFeedback, setSettingsFeedback] = (0, import_react.useState)(null);
+  const [selectedFile, setSelectedFile] = (0, import_react.useState)(null);
+  const [inspectingFile, setInspectingFile] = (0, import_react.useState)(false);
+  const [inspection, setInspection] = (0, import_react.useState)(null);
+  const [localError, setLocalError] = (0, import_react.useState)(null);
+  const [description, setDescription] = (0, import_react.useState)("");
+  const [isMandatory, setIsMandatory] = (0, import_react.useState)(false);
+  const [uploading, setUploading] = (0, import_react.useState)(false);
+  const [uploadPercent, setUploadPercent] = (0, import_react.useState)(0);
+  const [uploadedBytes, setUploadedBytes] = (0, import_react.useState)(0);
+  const [uploadTotalBytes, setUploadTotalBytes] = (0, import_react.useState)(0);
+  const [uploadSpeedBps, setUploadSpeedBps] = (0, import_react.useState)(0);
+  const [uploadPhaseText, setUploadPhaseText] = (0, import_react.useState)("");
+  const [uploadError, setUploadError] = (0, import_react.useState)(null);
+  const [uploadSuccessInfo, setUploadSuccessInfo] = (0, import_react.useState)(null);
+  const [actionBusy, setActionBusy] = (0, import_react.useState)(false);
+  const [showPreviewModal, setShowPreviewModal] = (0, import_react.useState)(false);
   const installedApp = getInstalledSamiAppInfo();
   const isLocalAndroidOrigin = isAndroidLocalAssetOrigin();
-  const resolveCallableServerBase = useCallback(
+  const resolveCallableServerBase = (0, import_react.useCallback)(
     async (explicitCandidate, signal) => {
       if (!isAndroidLocalAssetOrigin()) {
         return { serverBase: "", cloudSnap: null };
@@ -5595,7 +5823,7 @@ function SamiAdminUpdatePanel({
     },
     []
   );
-  const loadCloudStatusAndHistory = useCallback(
+  const loadCloudStatusAndHistory = (0, import_react.useCallback)(
     async (opts) => {
       if (inFlightBootstrapRef.current) return;
       inFlightBootstrapRef.current = true;
@@ -5708,7 +5936,7 @@ function SamiAdminUpdatePanel({
     },
     [notify, resolveCallableServerBase]
   );
-  useEffect(() => {
+  (0, import_react.useEffect)(() => {
     mountedRef.current = true;
     const ctrl = new AbortController();
     unmountAbortRef.current = ctrl;
@@ -6365,12 +6593,12 @@ function SamiAdminUpdatePanel({
   );
   const hasSavedServerToken = Boolean(githubStatus?.hasToken || vaultInfo?.hasSavedToken);
   const isGitHubReady = Boolean(githubStatus?.canPublishReleases || githubStatus?.configured && hasSavedServerToken);
-  return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { dir: "rtl", className: "space-y-4 text-right", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "bg-[#121824] border border-amber-400/40 rounded-2xl p-4 sm:p-5 flex flex-wrap items-center justify-between gap-4 shadow-xl", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "space-y-1 max-w-xl", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "flex items-center gap-2", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "text-base font-black text-amber-300", children: "\u0645\u0641\u062A\u0627\u062D \u0627\u0644\u062A\u062D\u0643\u0645 \u0627\u0644\u0634\u0627\u0645\u0644 \u0641\u064A \u062A\u0648\u0632\u064A\u0639 \u0627\u0644\u062A\u062D\u062F\u064A\u062B\u0627\u062A" }),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+  return /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { dir: "rtl", className: "space-y-4 text-right", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "bg-[#121824] border border-amber-400/40 rounded-2xl p-4 sm:p-5 flex flex-wrap items-center justify-between gap-4 shadow-xl", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "space-y-1 max-w-xl", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex items-center gap-2", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "text-base font-black text-amber-300", children: "\u0645\u0641\u062A\u0627\u062D \u0627\u0644\u062A\u062D\u0643\u0645 \u0627\u0644\u0634\u0627\u0645\u0644 \u0641\u064A \u062A\u0648\u0632\u064A\u0639 \u0627\u0644\u062A\u062D\u062F\u064A\u062B\u0627\u062A" }),
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
             "span",
             {
               className: `text-[10px] font-black px-2.5 py-0.5 rounded-full border ${globalDistributionEnabled ? "bg-emerald-500/15 border-emerald-500/40 text-emerald-300" : "bg-rose-500/15 border-rose-500/40 text-rose-300"}`,
@@ -6378,9 +6606,9 @@ function SamiAdminUpdatePanel({
             }
           )
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("p", { className: "text-xs text-slate-300 leading-relaxed", children: globalDistributionEnabled ? "\u062A\u0635\u0644 \u0625\u0634\u0639\u0627\u0631\u0627\u062A \u0627\u0644\u062A\u062D\u062F\u064A\u062B\u0627\u062A \u0627\u0644\u0645\u0646\u0634\u0648\u0631\u0629 \u0648\u0627\u0644\u0645\u0624\u0647\u0644\u0629 \u062A\u0644\u0642\u0627\u0626\u064A\u0627\u064B \u0644\u062C\u0645\u064A\u0639 \u0627\u0644\u0645\u0633\u062A\u062E\u062F\u0645\u064A\u0646 \u0627\u0644\u0630\u064A\u0646 \u0644\u0645 \u064A\u062B\u0628\u062A\u0648\u0627 \u0627\u0644\u0625\u0635\u062F\u0627\u0631 \u0628\u0639\u062F." : "\u062A\u0645 \u0625\u064A\u0642\u0627\u0641 \u062A\u0648\u0632\u064A\u0639 \u0643\u0627\u0641\u0629 \u0627\u0644\u062A\u062D\u062F\u064A\u062B\u0627\u062A \u0641\u0648\u0631\u0627\u064B. \u0644\u0646 \u064A\u0638\u0647\u0631 \u0623\u064A \u062A\u0646\u0628\u064A\u0647 \u062A\u062D\u062F\u064A\u062B \u0644\u0623\u064A \u0645\u0633\u062A\u062E\u062F\u0645 \u0628\u063A\u0636 \u0627\u0644\u0646\u0638\u0631 \u0639\u0646 \u0627\u0644\u0625\u0635\u062F\u0627\u0631\u0627\u062A \u0627\u0644\u0645\u0646\u0634\u0648\u0631\u0629 \u062F\u0648\u0646 \u062D\u0630\u0641 \u0627\u0644\u0633\u062C\u0644\u0627\u062A." })
+        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("p", { className: "text-xs text-slate-300 leading-relaxed", children: globalDistributionEnabled ? "\u062A\u0635\u0644 \u0625\u0634\u0639\u0627\u0631\u0627\u062A \u0627\u0644\u062A\u062D\u062F\u064A\u062B\u0627\u062A \u0627\u0644\u0645\u0646\u0634\u0648\u0631\u0629 \u0648\u0627\u0644\u0645\u0624\u0647\u0644\u0629 \u062A\u0644\u0642\u0627\u0626\u064A\u0627\u064B \u0644\u062C\u0645\u064A\u0639 \u0627\u0644\u0645\u0633\u062A\u062E\u062F\u0645\u064A\u0646 \u0627\u0644\u0630\u064A\u0646 \u0644\u0645 \u064A\u062B\u0628\u062A\u0648\u0627 \u0627\u0644\u0625\u0635\u062F\u0627\u0631 \u0628\u0639\u062F." : "\u062A\u0645 \u0625\u064A\u0642\u0627\u0641 \u062A\u0648\u0632\u064A\u0639 \u0643\u0627\u0641\u0629 \u0627\u0644\u062A\u062D\u062F\u064A\u062B\u0627\u062A \u0641\u0648\u0631\u0627\u064B. \u0644\u0646 \u064A\u0638\u0647\u0631 \u0623\u064A \u062A\u0646\u0628\u064A\u0647 \u062A\u062D\u062F\u064A\u062B \u0644\u0623\u064A \u0645\u0633\u062A\u062E\u062F\u0645 \u0628\u063A\u0636 \u0627\u0644\u0646\u0638\u0631 \u0639\u0646 \u0627\u0644\u0625\u0635\u062F\u0627\u0631\u0627\u062A \u0627\u0644\u0645\u0646\u0634\u0648\u0631\u0629 \u062F\u0648\u0646 \u062D\u0630\u0641 \u0627\u0644\u0633\u062C\u0644\u0627\u062A." })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
         "button",
         {
           type: "button",
@@ -6391,13 +6619,13 @@ function SamiAdminUpdatePanel({
         }
       )
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "bg-[#121824] border border-amber-500/40 rounded-2xl p-5 space-y-3", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "flex items-center justify-between gap-2", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { children: [
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("h3", { className: "text-sm font-black text-amber-300", children: "\u0646\u0638\u0627\u0645 \u0625\u062F\u0627\u0631\u0629 \u0648\u062A\u0648\u0632\u064A\u0639 \u062A\u062D\u062F\u064A\u062B\u0627\u062A \u062A\u0637\u0628\u064A\u0642 Sami" }),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("p", { className: "text-xs text-slate-400 mt-0.5", children: "\u062F\u0639\u0645 \u0627\u0644\u0631\u0641\u0639 \u0627\u0644\u0645\u0628\u0627\u0634\u0631 \u0639\u0628\u0631 GitHub Releases \u0623\u0648 \u0627\u0644\u062A\u0648\u0632\u064A\u0639 \u0639\u0628\u0631 \u0631\u0648\u0627\u0628\u0637 APK \u062E\u0627\u0631\u062C\u064A\u0629 \u0645\u0639 \u062A\u062D\u0643\u0645 \u0645\u0633\u062A\u0642\u0644 \u0641\u064A \u0643\u0644 \u0625\u0635\u062F\u0627\u0631" })
+    /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "bg-[#121824] border border-amber-500/40 rounded-2xl p-5 space-y-3", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex items-center justify-between gap-2", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("h3", { className: "text-sm font-black text-amber-300", children: "\u0646\u0638\u0627\u0645 \u0625\u062F\u0627\u0631\u0629 \u0648\u062A\u0648\u0632\u064A\u0639 \u062A\u062D\u062F\u064A\u062B\u0627\u062A \u062A\u0637\u0628\u064A\u0642 Sami" }),
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("p", { className: "text-xs text-slate-400 mt-0.5", children: "\u062F\u0639\u0645 \u0627\u0644\u0631\u0641\u0639 \u0627\u0644\u0645\u0628\u0627\u0634\u0631 \u0639\u0628\u0631 GitHub Releases \u0623\u0648 \u0627\u0644\u062A\u0648\u0632\u064A\u0639 \u0639\u0628\u0631 \u0631\u0648\u0627\u0628\u0637 APK \u062E\u0627\u0631\u062C\u064A\u0629 \u0645\u0639 \u062A\u062D\u0643\u0645 \u0645\u0633\u062A\u0642\u0644 \u0641\u064A \u0643\u0644 \u0625\u0635\u062F\u0627\u0631" })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
           "button",
           {
             type: "button",
@@ -6408,14 +6636,14 @@ function SamiAdminUpdatePanel({
           }
         )
       ] }),
-      (connectionState === "error" || connectionState === "needs_server_url") && connectionErrorAr && /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(
+      (connectionState === "error" || connectionState === "needs_server_url") && connectionErrorAr && /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(
         "div",
         {
           className: `rounded-xl p-3.5 border text-xs space-y-2.5 ${connectionState === "needs_server_url" ? "bg-amber-500/10 border-amber-500/40 text-amber-200" : "bg-rose-500/10 border-rose-500/40 text-rose-200"}`,
           children: [
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "flex items-center justify-between gap-2", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "font-black", children: connectionState === "needs_server_url" ? "\u0645\u0637\u0644\u0648\u0628 \u062A\u062D\u062F\u064A\u062F \u0639\u0646\u0648\u0627\u0646 \u0627\u0644\u062E\u0627\u062F\u0645 \u0627\u0644\u0645\u0646\u0634\u0648\u0631 (HTTPS)" : "\u062A\u0646\u0628\u064A\u0647 \u0627\u062A\u0635\u0627\u0644 \u0628\u0627\u0644\u062E\u0627\u062F\u0645" }),
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex items-center justify-between gap-2", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "font-black", children: connectionState === "needs_server_url" ? "\u0645\u0637\u0644\u0648\u0628 \u062A\u062D\u062F\u064A\u062F \u0639\u0646\u0648\u0627\u0646 \u0627\u0644\u062E\u0627\u062F\u0645 \u0627\u0644\u0645\u0646\u0634\u0648\u0631 (HTTPS)" : "\u062A\u0646\u0628\u064A\u0647 \u0627\u062A\u0635\u0627\u0644 \u0628\u0627\u0644\u062E\u0627\u062F\u0645" }),
+              /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
                 "button",
                 {
                   type: "button",
@@ -6426,14 +6654,14 @@ function SamiAdminUpdatePanel({
                 }
               )
             ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("p", { className: "text-[11px] leading-relaxed", children: connectionErrorAr })
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("p", { className: "text-[11px] leading-relaxed", children: connectionErrorAr })
           ]
         }
       ),
-      /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "bg-[#0b0f17] p-3 rounded-xl border border-slate-800 flex items-center justify-between gap-2", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "text-slate-400", children: "\u0627\u0644\u0645\u0633\u062A\u0648\u062F\u0639 \u0627\u0644\u0645\u0633\u062A\u062E\u062F\u0645 \u062D\u0627\u0644\u064A\u0627\u064B:" }),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+      /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "bg-[#0b0f17] p-3 rounded-xl border border-slate-800 flex items-center justify-between gap-2", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "text-slate-400", children: "\u0627\u0644\u0645\u0633\u062A\u0648\u062F\u0639 \u0627\u0644\u0645\u0633\u062A\u062E\u062F\u0645 \u062D\u0627\u0644\u064A\u0627\u064B:" }),
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
             "span",
             {
               dir: "ltr",
@@ -6442,17 +6670,17 @@ function SamiAdminUpdatePanel({
             }
           )
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "bg-[#0b0f17] p-3 rounded-xl border border-slate-800 flex items-center justify-between gap-2", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "text-slate-400", children: "\u062D\u0627\u0644\u0629 \u0625\u0639\u062F\u0627\u062F\u0627\u062A GitHub:" }),
-          loadingStatus && connectionState === "connecting" ? /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "font-black text-amber-300", children: "\u062C\u0627\u0631\u064D \u0642\u0631\u0627\u0621\u0629 \u0627\u0644\u0625\u0639\u062F\u0627\u062F\u0627\u062A \u0627\u0644\u0633\u062D\u0627\u0628\u064A\u0629..." }) : githubStatus?.liveTested && githubStatus?.canPublishReleases ? /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("span", { className: "font-black text-emerald-400", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "bg-[#0b0f17] p-3 rounded-xl border border-slate-800 flex items-center justify-between gap-2", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "text-slate-400", children: "\u062D\u0627\u0644\u0629 \u0625\u0639\u062F\u0627\u062F\u0627\u062A GitHub:" }),
+          loadingStatus && connectionState === "connecting" ? /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "font-black text-amber-300", children: "\u062C\u0627\u0631\u064D \u0642\u0631\u0627\u0621\u0629 \u0627\u0644\u0625\u0639\u062F\u0627\u062F\u0627\u062A \u0627\u0644\u0633\u062D\u0627\u0628\u064A\u0629..." }) : githubStatus?.liveTested && githubStatus?.canPublishReleases ? /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("span", { className: "font-black text-emerald-400", children: [
             "\u0645\u062A\u0635\u0644 \u0648\u062C\u0627\u0647\u0632 \u0644\u0644\u0646\u0634\u0631 (",
             githubStatus.isPrivate ? "\u062E\u0627\u0635" : "\u0639\u0627\u0645",
             ") \u2713"
-          ] }) : isGitHubReady ? /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "font-black text-emerald-400", children: "\u0627\u0644\u0625\u0639\u062F\u0627\u062F\u0627\u062A \u0648\u0627\u0644\u062A\u0648\u0643\u0646 \u0645\u062D\u0641\u0648\u0638\u0627\u0646 \u2713" }) : githubStatus?.exists ? /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "font-black text-amber-400", children: "\u064A\u0644\u0632\u0645 \u062D\u0641\u0638 \u0627\u0644\u062A\u0648\u0643\u0646 \u0623\u0648 \u0627\u062E\u062A\u0628\u0627\u0631 \u0627\u0644\u0635\u0644\u0627\u062D\u064A\u0629" }) : /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "font-black text-rose-400", children: "\u063A\u064A\u0631 \u0645\u0643\u062A\u0645\u0644" })
+          ] }) : isGitHubReady ? /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "font-black text-emerald-400", children: "\u0627\u0644\u0625\u0639\u062F\u0627\u062F\u0627\u062A \u0648\u0627\u0644\u062A\u0648\u0643\u0646 \u0645\u062D\u0641\u0648\u0638\u0627\u0646 \u2713" }) : githubStatus?.exists ? /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "font-black text-amber-400", children: "\u064A\u0644\u0632\u0645 \u062D\u0641\u0638 \u0627\u0644\u062A\u0648\u0643\u0646 \u0623\u0648 \u0627\u062E\u062A\u0628\u0627\u0631 \u0627\u0644\u0635\u0644\u0627\u062D\u064A\u0629" }) : /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "font-black text-rose-400", children: "\u063A\u064A\u0631 \u0645\u0643\u062A\u0645\u0644" })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "bg-[#0b0f17] p-3 rounded-xl border border-slate-800 flex items-center justify-between gap-2", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "text-slate-400", children: "\u0627\u0644\u0646\u0633\u062E\u0629 \u0627\u0644\u0645\u062B\u0628\u062A\u0629 \u0639\u0644\u0649 \u0647\u0630\u0627 \u0627\u0644\u062C\u0647\u0627\u0632:" }),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("span", { dir: "ltr", className: "font-bold text-slate-200 font-['JetBrains_Mono',monospace] tabular-nums", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "bg-[#0b0f17] p-3 rounded-xl border border-slate-800 flex items-center justify-between gap-2", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "text-slate-400", children: "\u0627\u0644\u0646\u0633\u062E\u0629 \u0627\u0644\u0645\u062B\u0628\u062A\u0629 \u0639\u0644\u0649 \u0647\u0630\u0627 \u0627\u0644\u062C\u0647\u0627\u0632:" }),
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("span", { dir: "ltr", className: "font-bold text-slate-200 font-['JetBrains_Mono',monospace] tabular-nums", children: [
             "v",
             installedApp.versionName,
             " (Build ",
@@ -6460,17 +6688,17 @@ function SamiAdminUpdatePanel({
             ")"
           ] })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "bg-[#0b0f17] p-3 rounded-xl border border-slate-800 flex items-center justify-between gap-2", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "text-slate-400", children: "\u0622\u062E\u0631 \u062A\u062D\u062F\u064A\u062B \u0645\u0646\u0634\u0648\u0631:" }),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: `font-black ${isCurrentActive ? "text-emerald-400" : "text-slate-400"}`, children: isCurrentActive && currentPublished ? `v${currentPublished.versionName} (Build ${currentPublished.versionCode})` : "\u0644\u0627 \u064A\u0648\u062C\u062F \u062A\u062D\u062F\u064A\u062B \u0646\u0634\u0637 \u062D\u0627\u0644\u064A\u0627\u064B" })
+        /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "bg-[#0b0f17] p-3 rounded-xl border border-slate-800 flex items-center justify-between gap-2", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "text-slate-400", children: "\u0622\u062E\u0631 \u062A\u062D\u062F\u064A\u062B \u0645\u0646\u0634\u0648\u0631:" }),
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: `font-black ${isCurrentActive ? "text-emerald-400" : "text-slate-400"}`, children: isCurrentActive && currentPublished ? `v${currentPublished.versionName} (Build ${currentPublished.versionCode})` : "\u0644\u0627 \u064A\u0648\u062C\u062F \u062A\u062D\u062F\u064A\u062B \u0646\u0634\u0637 \u062D\u0627\u0644\u064A\u0627\u064B" })
         ] })
       ] }),
-      signingKeyInfo && /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "bg-[#0b0f17] border border-slate-800 rounded-xl p-3 text-[11px] space-y-1", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "flex items-center justify-between", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "text-slate-400 font-bold", children: "\u0634\u0647\u0627\u062F\u0629 \u062A\u0648\u0642\u064A\u0639 Sami \u0627\u0644\u0645\u0639\u062A\u0645\u062F\u0629:" }),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: signingKeyInfo.available ? "text-emerald-400 font-black" : "text-rose-400 font-black", children: signingKeyInfo.available ? "\u0645\u062A\u0648\u0641\u0631\u0629 \u0648\u0645\u0637\u0627\u0628\u0642\u0629 \u2713" : "\u0645\u0641\u0642\u0648\u062F\u0629 \u2717" })
+      signingKeyInfo && /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "bg-[#0b0f17] border border-slate-800 rounded-xl p-3 text-[11px] space-y-1", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex items-center justify-between", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "text-slate-400 font-bold", children: "\u0634\u0647\u0627\u062F\u0629 \u062A\u0648\u0642\u064A\u0639 Sami \u0627\u0644\u0645\u0639\u062A\u0645\u062F\u0629:" }),
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: signingKeyInfo.available ? "text-emerald-400 font-black" : "text-rose-400 font-black", children: signingKeyInfo.available ? "\u0645\u062A\u0648\u0641\u0631\u0629 \u0648\u0645\u0637\u0627\u0628\u0642\u0629 \u2713" : "\u0645\u0641\u0642\u0648\u062F\u0629 \u2717" })
         ] }),
-        signingKeyInfo.sha256Fingerprint && /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(
+        signingKeyInfo.sha256Fingerprint && /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(
           "div",
           {
             dir: "ltr",
@@ -6483,40 +6711,40 @@ function SamiAdminUpdatePanel({
         )
       ] })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "bg-[#121824] border border-amber-400/30 rounded-2xl overflow-hidden", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(
+    /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "bg-[#121824] border border-amber-400/30 rounded-2xl overflow-hidden", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(
         "button",
         {
           type: "button",
           onClick: () => setSettingsOpen((prev) => !prev),
           className: "w-full p-4 sm:p-5 flex items-center justify-between gap-3 text-right hover:bg-slate-800/50 transition cursor-pointer",
           children: [
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "space-y-1 min-w-0", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "text-xs sm:text-sm font-black text-amber-300", children: "\u2699\uFE0F \u0625\u0639\u062F\u0627\u062F\u0627\u062A \u0645\u0633\u062A\u0648\u062F\u0639 GitHub Releases" }),
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "flex flex-wrap items-center gap-2 text-[11px] text-slate-400", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("span", { children: [
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "space-y-1 min-w-0", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "text-xs sm:text-sm font-black text-amber-300", children: "\u2699\uFE0F \u0625\u0639\u062F\u0627\u062F\u0627\u062A \u0645\u0633\u062A\u0648\u062F\u0639 GitHub Releases" }),
+              /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex flex-wrap items-center gap-2 text-[11px] text-slate-400", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("span", { children: [
                   "\u0627\u0644\u0645\u0633\u062A\u0648\u062F\u0639 \u0627\u0644\u062D\u0627\u0644\u064A:",
                   " ",
-                  /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("strong", { dir: "ltr", className: "text-slate-200 font-['JetBrains_Mono',monospace]", children: githubStatus?.fullName || "\u063A\u064A\u0631 \u0645\u062D\u062F\u062F" })
+                  /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("strong", { dir: "ltr", className: "text-slate-200 font-['JetBrains_Mono',monospace]", children: githubStatus?.fullName || "\u063A\u064A\u0631 \u0645\u062D\u062F\u062F" })
                 ] }),
-                /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { "aria-hidden": "true", children: "\xB7" }),
-                /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: hasSavedServerToken ? "text-emerald-400 font-bold" : "text-amber-400 font-bold", children: hasSavedServerToken ? "\u0627\u0644\u062A\u0648\u0643\u0646 \u0645\u062D\u0641\u0648\u0638 \u2713" : "\u0627\u0644\u062A\u0648\u0643\u0646 \u063A\u064A\u0631 \u0645\u062D\u0641\u0648\u0638" })
+                /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { "aria-hidden": "true", children: "\xB7" }),
+                /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: hasSavedServerToken ? "text-emerald-400 font-bold" : "text-amber-400 font-bold", children: hasSavedServerToken ? "\u0627\u0644\u062A\u0648\u0643\u0646 \u0645\u062D\u0641\u0648\u0638 \u2713" : "\u0627\u0644\u062A\u0648\u0643\u0646 \u063A\u064A\u0631 \u0645\u062D\u0641\u0648\u0638" })
               ] })
             ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "shrink-0 px-3 py-1.5 rounded-lg bg-[#0b0f17] border border-slate-700 text-[11px] font-bold text-amber-300", children: settingsOpen ? "\u0625\u062E\u0641\u0627\u0621 \u25B2" : "\u062A\u0639\u062F\u064A\u0644 \u0627\u0644\u0625\u0639\u062F\u0627\u062F\u0627\u062A \u25BC" })
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "shrink-0 px-3 py-1.5 rounded-lg bg-[#0b0f17] border border-slate-700 text-[11px] font-bold text-amber-300", children: settingsOpen ? "\u0625\u062E\u0641\u0627\u0621 \u25B2" : "\u062A\u0639\u062F\u064A\u0644 \u0627\u0644\u0625\u0639\u062F\u0627\u062F\u0627\u062A \u25BC" })
           ]
         }
       ),
-      settingsOpen && /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "p-4 sm:p-5 border-t border-slate-800/80 space-y-4 text-xs", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "grid grid-cols-1 sm:grid-cols-2 gap-3", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { children: [
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("label", { className: "block text-slate-300 font-bold mb-1.5", children: [
+      settingsOpen && /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "p-4 sm:p-5 border-t border-slate-800/80 space-y-4 text-xs", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "grid grid-cols-1 sm:grid-cols-2 gap-3", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { children: [
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("label", { className: "block text-slate-300 font-bold mb-1.5", children: [
               "1. ",
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { dir: "ltr", className: "font-['JetBrains_Mono',monospace] text-amber-300", children: "GITHUB_OWNER" }),
+              /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { dir: "ltr", className: "font-['JetBrains_Mono',monospace] text-amber-300", children: "GITHUB_OWNER" }),
               " ",
               "(\u0627\u0633\u0645 \u0645\u0627\u0644\u0643 \u0627\u0644\u0645\u0633\u062A\u0648\u062F\u0639)"
             ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
               "input",
               {
                 type: "text",
@@ -6531,14 +6759,14 @@ function SamiAdminUpdatePanel({
               }
             )
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { children: [
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("label", { className: "block text-slate-300 font-bold mb-1.5", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { children: [
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("label", { className: "block text-slate-300 font-bold mb-1.5", children: [
               "2. ",
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { dir: "ltr", className: "font-['JetBrains_Mono',monospace] text-amber-300", children: "GITHUB_REPO" }),
+              /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { dir: "ltr", className: "font-['JetBrains_Mono',monospace] text-amber-300", children: "GITHUB_REPO" }),
               " ",
               "(\u0627\u0633\u0645 \u0627\u0644\u0645\u0633\u062A\u0648\u062F\u0639)"
             ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
               "input",
               {
                 type: "text",
@@ -6554,15 +6782,15 @@ function SamiAdminUpdatePanel({
             )
           ] })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { children: [
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("label", { className: "block text-slate-300 font-bold mb-1.5", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("label", { className: "block text-slate-300 font-bold mb-1.5", children: [
             "3. ",
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { dir: "ltr", className: "font-['JetBrains_Mono',monospace] text-amber-300", children: "GITHUB_TOKEN" }),
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { dir: "ltr", className: "font-['JetBrains_Mono',monospace] text-amber-300", children: "GITHUB_TOKEN" }),
             " ",
             "(\u0627\u0644\u062A\u0648\u0643\u0646 \u0627\u0644\u0633\u0631\u064A \u2014 \u0635\u0644\u0627\u062D\u064A\u0629 Contents: Read and write)"
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "flex items-center gap-2", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex items-center gap-2", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
               "input",
               {
                 type: showToken ? "text" : "password",
@@ -6576,7 +6804,7 @@ function SamiAdminUpdatePanel({
                 className: "flex-1 min-w-0 bg-[#0b0f17] border border-slate-700 rounded-xl p-3 text-slate-100 text-xs font-['JetBrains_Mono',monospace] focus:outline-none focus:border-amber-400"
               }
             ),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
               "button",
               {
                 type: "button",
@@ -6588,15 +6816,15 @@ function SamiAdminUpdatePanel({
             )
           ] })
         ] }),
-        settingsFeedback && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+        settingsFeedback && /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
           "div",
           {
             className: `rounded-xl p-3 border text-xs font-bold leading-relaxed ${settingsFeedback.ok ? "bg-emerald-500/10 border-emerald-500/40 text-emerald-300" : "bg-rose-500/10 border-rose-500/40 text-rose-300"}`,
             children: settingsFeedback.text
           }
         ),
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+        /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
             "button",
             {
               type: "button",
@@ -6606,7 +6834,7 @@ function SamiAdminUpdatePanel({
               children: savingSettings ? "\u062C\u0627\u0631\u064D \u0627\u0644\u062D\u0641\u0638 \u0627\u0644\u0633\u062D\u0627\u0628\u064A \u0627\u0644\u062F\u0627\u0626\u0645..." : "\u062D\u0641\u0638 \u0625\u0639\u062F\u0627\u062F\u0627\u062A GitHub"
             }
           ),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
             "button",
             {
               type: "button",
@@ -6619,36 +6847,36 @@ function SamiAdminUpdatePanel({
         ] })
       ] })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "bg-[#121824] border border-slate-800 rounded-2xl p-5 space-y-4", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "flex items-center justify-between border-b border-slate-800/80 pb-3", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("h4", { className: "text-sm font-black text-amber-300", children: "\u0646\u0634\u0631 \u062A\u062D\u062F\u064A\u062B \u062C\u062F\u064A\u062F \u0644\u062A\u0637\u0628\u064A\u0642 Sami" }),
-        currentUser?.displayName && /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("span", { className: "text-[11px] text-slate-400", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "bg-[#121824] border border-slate-800 rounded-2xl p-5 space-y-4", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex items-center justify-between border-b border-slate-800/80 pb-3", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("h4", { className: "text-sm font-black text-amber-300", children: "\u0646\u0634\u0631 \u062A\u062D\u062F\u064A\u062B \u062C\u062F\u064A\u062F \u0644\u062A\u0637\u0628\u064A\u0642 Sami" }),
+        currentUser?.displayName && /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("span", { className: "text-[11px] text-slate-400", children: [
           "\u0627\u0644\u0645\u0633\u0624\u0648\u0644: ",
           currentUser.displayName
         ] })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "grid grid-cols-2 gap-2 bg-[#090d16] p-1.5 rounded-xl border border-slate-800", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+      /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "grid grid-cols-2 gap-2 bg-[#090d16] p-1.5 rounded-xl border border-slate-800", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
           "button",
           {
             type: "button",
             onClick: () => setPublishTab("github"),
             className: `py-2.5 px-3 rounded-lg text-xs font-black transition cursor-pointer flex items-center justify-center gap-1.5 ${publishTab === "github" ? "bg-amber-400 text-slate-950 shadow-md" : "text-slate-400 hover:text-slate-200"}`,
-            children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { children: "\u{1F4E6} \u0631\u0641\u0639 \u0645\u0644\u0641 APK \u0639\u0628\u0631 GitHub Releases" })
+            children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { children: "\u{1F4E6} \u0631\u0641\u0639 \u0645\u0644\u0641 APK \u0639\u0628\u0631 GitHub Releases" })
           }
         ),
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
           "button",
           {
             type: "button",
             onClick: () => setPublishTab("external"),
             className: `py-2.5 px-3 rounded-lg text-xs font-black transition cursor-pointer flex items-center justify-center gap-1.5 ${publishTab === "external" ? "bg-amber-400 text-slate-950 shadow-md" : "text-slate-400 hover:text-slate-200"}`,
-            children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { children: "\u{1F310} \u0631\u0627\u0628\u0637 \u062A\u062D\u0645\u064A\u0644 APK \u062E\u0627\u0631\u062C\u064A (External Download URL)" })
+            children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { children: "\u{1F310} \u0631\u0627\u0628\u0637 \u062A\u062D\u0645\u064A\u0644 APK \u062E\u0627\u0631\u062C\u064A (External Download URL)" })
           }
         )
       ] }),
-      publishTab === "github" && /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "space-y-4", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+      publishTab === "github" && /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "space-y-4", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
           "input",
           {
             ref: fileInputRef,
@@ -6658,26 +6886,26 @@ function SamiAdminUpdatePanel({
             className: "hidden"
           }
         ),
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
           "button",
           {
             type: "button",
             disabled: uploading || inspectingFile,
             onClick: handleChooseApkClick,
             className: "w-full py-4 px-4 rounded-xl bg-[#0b101c] hover:bg-[#101829] border-2 border-dashed border-amber-400/50 hover:border-amber-400 text-amber-300 font-black text-sm flex items-center justify-center gap-2.5 transition cursor-pointer disabled:opacity-50",
-            children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { children: "\u{1F4E6} \u0627\u062E\u062A\u064A\u0627\u0631 \u0645\u0644\u0641 APK \u0648\u0631\u0641\u0639\u0647 \u0625\u0644\u0649 GitHub Releases" })
+            children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { children: "\u{1F4E6} \u0627\u062E\u062A\u064A\u0627\u0631 \u0645\u0644\u0641 APK \u0648\u0631\u0641\u0639\u0647 \u0625\u0644\u0649 GitHub Releases" })
           }
         ),
-        inspectingFile && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "bg-[#0b0f17] border border-amber-400/30 rounded-xl p-3.5 text-xs text-amber-300 font-bold text-center", children: "\u062C\u0627\u0631\u064D \u0642\u0631\u0627\u0621\u0629 \u062D\u0632\u0645\u0629 \u0627\u0644\u0640 APK \u0648\u0627\u0633\u062A\u062E\u0631\u0627\u062C \u0627\u0644\u0628\u064A\u0627\u0646\u0627\u062A \u0648\u0634\u0647\u0627\u062F\u0629 \u0627\u0644\u062A\u0648\u0642\u064A\u0639 \u0648\u062D\u0633\u0627\u0628 SHA-256..." }),
-        localError && !inspection && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "bg-rose-500/10 border border-rose-500/40 rounded-xl p-3.5 text-xs text-rose-300 font-bold", children: localError }),
-        inspection && /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(
+        inspectingFile && /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "bg-[#0b0f17] border border-amber-400/30 rounded-xl p-3.5 text-xs text-amber-300 font-bold text-center", children: "\u062C\u0627\u0631\u064D \u0642\u0631\u0627\u0621\u0629 \u062D\u0632\u0645\u0629 \u0627\u0644\u0640 APK \u0648\u0627\u0633\u062A\u062E\u0631\u0627\u062C \u0627\u0644\u0628\u064A\u0627\u0646\u0627\u062A \u0648\u0634\u0647\u0627\u062F\u0629 \u0627\u0644\u062A\u0648\u0642\u064A\u0639 \u0648\u062D\u0633\u0627\u0628 SHA-256..." }),
+        localError && !inspection && /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "bg-rose-500/10 border border-rose-500/40 rounded-xl p-3.5 text-xs text-rose-300 font-bold", children: localError }),
+        inspection && /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(
           "div",
           {
             className: `rounded-xl p-4 border space-y-3 text-xs ${inspection.canPublish ? "bg-[#0b111d] border-emerald-500/40" : "bg-[#140c12] border-rose-500/40"}`,
             children: [
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "flex items-center justify-between border-b border-slate-800 pb-2.5", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "font-black text-slate-100", children: "\u0628\u064A\u0627\u0646\u0627\u062A \u062D\u0632\u0645\u0629 \u0627\u0644\u0640 APK \u0627\u0644\u0645\u0633\u062A\u062E\u0631\u062C\u0629:" }),
-                /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+              /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex items-center justify-between border-b border-slate-800 pb-2.5", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "font-black text-slate-100", children: "\u0628\u064A\u0627\u0646\u0627\u062A \u062D\u0632\u0645\u0629 \u0627\u0644\u0640 APK \u0627\u0644\u0645\u0633\u062A\u062E\u0631\u062C\u0629:" }),
+                /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
                   "span",
                   {
                     className: `text-[11px] font-black px-2.5 py-0.5 rounded-md border ${inspection.canPublish ? "bg-emerald-500/15 border-emerald-500/40 text-emerald-300" : "bg-rose-500/15 border-rose-500/40 text-rose-300"}`,
@@ -6685,10 +6913,10 @@ function SamiAdminUpdatePanel({
                   }
                 )
               ] }),
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "grid grid-cols-2 gap-2.5", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "bg-[#080c14] p-2.5 rounded-lg border border-slate-800/80", children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "block text-[10px] text-slate-400", children: "\u0645\u0639\u0631\u0651\u0641 \u0627\u0644\u062A\u0637\u0628\u064A\u0642 (applicationId)" }),
-                  /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+              /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "grid grid-cols-2 gap-2.5", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "bg-[#080c14] p-2.5 rounded-lg border border-slate-800/80", children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "block text-[10px] text-slate-400", children: "\u0645\u0639\u0631\u0651\u0641 \u0627\u0644\u062A\u0637\u0628\u064A\u0642 (applicationId)" }),
+                  /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
                     "span",
                     {
                       dir: "ltr",
@@ -6697,9 +6925,9 @@ function SamiAdminUpdatePanel({
                     }
                   )
                 ] }),
-                /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "bg-[#080c14] p-2.5 rounded-lg border border-slate-800/80", children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "block text-[10px] text-slate-400", children: "\u0627\u0644\u0625\u0635\u062F\u0627\u0631 \u0648\u0643\u0648\u062F \u0627\u0644\u0628\u0646\u0627\u0621" }),
-                  /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(
+                /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "bg-[#080c14] p-2.5 rounded-lg border border-slate-800/80", children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "block text-[10px] text-slate-400", children: "\u0627\u0644\u0625\u0635\u062F\u0627\u0631 \u0648\u0643\u0648\u062F \u0627\u0644\u0628\u0646\u0627\u0621" }),
+                  /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(
                     "span",
                     {
                       dir: "ltr",
@@ -6714,9 +6942,9 @@ function SamiAdminUpdatePanel({
                     }
                   )
                 ] }),
-                /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "bg-[#080c14] p-2.5 rounded-lg border border-slate-800/80", children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "block text-[10px] text-slate-400", children: "\u062D\u062C\u0645 \u0645\u0644\u0641 \u0627\u0644\u0640 APK" }),
-                  /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(
+                /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "bg-[#080c14] p-2.5 rounded-lg border border-slate-800/80", children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "block text-[10px] text-slate-400", children: "\u062D\u062C\u0645 \u0645\u0644\u0641 \u0627\u0644\u0640 APK" }),
+                  /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(
                     "span",
                     {
                       dir: "ltr",
@@ -6730,9 +6958,9 @@ function SamiAdminUpdatePanel({
                     }
                   )
                 ] }),
-                /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "bg-[#080c14] p-2.5 rounded-lg border border-slate-800/80", children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "block text-[10px] text-slate-400", children: "\u062A\u0637\u0627\u0628\u0642 \u0634\u0647\u0627\u062F\u0629 \u0627\u0644\u062A\u0648\u0642\u064A\u0639" }),
-                  /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+                /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "bg-[#080c14] p-2.5 rounded-lg border border-slate-800/80", children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "block text-[10px] text-slate-400", children: "\u062A\u0637\u0627\u0628\u0642 \u0634\u0647\u0627\u062F\u0629 \u0627\u0644\u062A\u0648\u0642\u064A\u0639" }),
+                  /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
                     "span",
                     {
                       className: `block font-black mt-0.5 ${inspection.signatureMatchesOriginal ? "text-emerald-400" : "text-rose-400"}`,
@@ -6741,18 +6969,18 @@ function SamiAdminUpdatePanel({
                   )
                 ] })
               ] }),
-              inspection.errors?.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "bg-rose-500/15 border border-rose-500/40 rounded-lg p-3 space-y-1 text-rose-200", children: inspection.errors.map((errStr, i) => /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "font-bold", children: [
+              inspection.errors?.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "bg-rose-500/15 border border-rose-500/40 rounded-lg p-3 space-y-1 text-rose-200", children: inspection.errors.map((errStr, i) => /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "font-bold", children: [
                 "\u2022 ",
                 errStr
               ] }, i)) })
             ]
           }
         ),
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "space-y-3 text-xs", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { children: [
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("label", { className: "block text-slate-300 font-bold mb-1.5", children: "\u0646\u0648\u0639 \u0627\u0644\u062A\u062D\u062F\u064A\u062B \u0644\u0644\u0645\u0633\u062A\u062E\u062F\u0645\u064A\u0646:" }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "grid grid-cols-1 sm:grid-cols-2 gap-2", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(
+        /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "space-y-3 text-xs", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { children: [
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("label", { className: "block text-slate-300 font-bold mb-1.5", children: "\u0646\u0648\u0639 \u0627\u0644\u062A\u062D\u062F\u064A\u062B \u0644\u0644\u0645\u0633\u062A\u062E\u062F\u0645\u064A\u0646:" }),
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "grid grid-cols-1 sm:grid-cols-2 gap-2", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(
                 "button",
                 {
                   type: "button",
@@ -6760,12 +6988,12 @@ function SamiAdminUpdatePanel({
                   onClick: () => setIsMandatory(false),
                   className: `p-3 rounded-xl border text-right transition cursor-pointer ${!isMandatory ? "bg-amber-400/15 border-amber-400 text-amber-200" : "bg-[#0b0f17] border-slate-800 text-slate-400 hover:border-slate-700"}`,
                   children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "font-black text-xs", children: "\u062A\u062D\u062F\u064A\u062B \u0627\u062E\u062A\u064A\u0627\u0631\u064A \u0645\u0639 \u0625\u0645\u0643\u0627\u0646\u064A\u0629 \u0627\u062E\u062A\u064A\u0627\u0631 \xAB\u0644\u0627\u062D\u0642\u064B\u0627\xBB" }),
-                    /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "text-[10px] opacity-80 mt-0.5", children: "\u064A\u0633\u0645\u062D \u0644\u0644\u0645\u0633\u062A\u062E\u062F\u0645 \u0628\u062A\u0623\u062C\u064A\u0644 \u0627\u0644\u062A\u062D\u062F\u064A\u062B \u0648\u0645\u062A\u0627\u0628\u0639\u0629 \u0627\u0644\u062A\u0635\u0641\u062D" })
+                    /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "font-black text-xs", children: "\u062A\u062D\u062F\u064A\u062B \u0627\u062E\u062A\u064A\u0627\u0631\u064A \u0645\u0639 \u0625\u0645\u0643\u0627\u0646\u064A\u0629 \u0627\u062E\u062A\u064A\u0627\u0631 \xAB\u0644\u0627\u062D\u0642\u064B\u0627\xBB" }),
+                    /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "text-[10px] opacity-80 mt-0.5", children: "\u064A\u0633\u0645\u062D \u0644\u0644\u0645\u0633\u062A\u062E\u062F\u0645 \u0628\u062A\u0623\u062C\u064A\u0644 \u0627\u0644\u062A\u062D\u062F\u064A\u062B \u0648\u0645\u062A\u0627\u0628\u0639\u0629 \u0627\u0644\u062A\u0635\u0641\u062D" })
                   ]
                 }
               ),
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(
+              /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(
                 "button",
                 {
                   type: "button",
@@ -6773,16 +7001,16 @@ function SamiAdminUpdatePanel({
                   onClick: () => setIsMandatory(true),
                   className: `p-3 rounded-xl border text-right transition cursor-pointer ${isMandatory ? "bg-rose-500/15 border-rose-500 text-rose-200" : "bg-[#0b0f17] border-slate-800 text-slate-400 hover:border-slate-700"}`,
                   children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "font-black text-xs", children: "\u062A\u062D\u062F\u064A\u062B \u0625\u0644\u0632\u0627\u0645\u064A" }),
-                    /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "text-[10px] opacity-80 mt-0.5", children: "\u064A\u0644\u0632\u0645 \u0627\u0644\u0645\u0633\u062A\u062E\u062F\u0645 \u0628\u062A\u062D\u0645\u064A\u0644 \u0648\u062A\u062B\u0628\u064A\u062A \u0627\u0644\u062A\u062D\u062F\u064A\u062B \u0642\u0628\u0644 \u0627\u0644\u0645\u062A\u0627\u0628\u0639\u0629" })
+                    /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "font-black text-xs", children: "\u062A\u062D\u062F\u064A\u062B \u0625\u0644\u0632\u0627\u0645\u064A" }),
+                    /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "text-[10px] opacity-80 mt-0.5", children: "\u064A\u0644\u0632\u0645 \u0627\u0644\u0645\u0633\u062A\u062E\u062F\u0645 \u0628\u062A\u062D\u0645\u064A\u0644 \u0648\u062A\u062B\u0628\u064A\u062A \u0627\u0644\u062A\u062D\u062F\u064A\u062B \u0642\u0628\u0644 \u0627\u0644\u0645\u062A\u0627\u0628\u0639\u0629" })
                   ]
                 }
               )
             ] })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { children: [
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("label", { className: "block text-slate-300 font-bold mb-1.5", children: "\u0648\u0635\u0641 \u0627\u0644\u062A\u062D\u062F\u064A\u062B \u0648\u0645\u0627 \u0627\u0644\u062C\u062F\u064A\u062F:" }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { children: [
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("label", { className: "block text-slate-300 font-bold mb-1.5", children: "\u0648\u0635\u0641 \u0627\u0644\u062A\u062D\u062F\u064A\u062B \u0648\u0645\u0627 \u0627\u0644\u062C\u062F\u064A\u062F:" }),
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
               "textarea",
               {
                 rows: 3,
@@ -6795,63 +7023,63 @@ function SamiAdminUpdatePanel({
             )
           ] })
         ] }),
-        (uploading || uploadError || uploadSuccessInfo) && /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "bg-[#0b0f19] border border-slate-800 rounded-xl p-4 space-y-2.5 text-xs", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "flex items-center justify-between gap-2", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+        (uploading || uploadError || uploadSuccessInfo) && /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "bg-[#0b0f19] border border-slate-800 rounded-xl p-4 space-y-2.5 text-xs", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex items-center justify-between gap-2", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
               "span",
               {
                 className: `font-black ${uploadError ? "text-rose-400" : uploadSuccessInfo ? "text-emerald-400" : "text-amber-300"}`,
                 children: uploadPhaseText
               }
             ),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("span", { dir: "ltr", className: "font-black text-slate-100 font-['JetBrains_Mono',monospace] tabular-nums", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("span", { dir: "ltr", className: "font-black text-slate-100 font-['JetBrains_Mono',monospace] tabular-nums", children: [
               uploadPercent,
               "%"
             ] })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
             GoldProgressBar,
             {
               percent: uploadPercent,
               variant: uploadError ? "rose" : uploadSuccessInfo ? "emerald" : "gold"
             }
           ),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "flex items-center justify-between text-[11px] text-slate-400 font-['JetBrains_Mono',monospace] tabular-nums", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("span", { dir: "ltr", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex items-center justify-between text-[11px] text-slate-400 font-['JetBrains_Mono',monospace] tabular-nums", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("span", { dir: "ltr", children: [
               formatBytesAr(uploadedBytes),
               " / ",
               formatBytesAr(uploadTotalBytes)
             ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { dir: "ltr", className: "text-amber-300", children: uploading && uploadSpeedBps > 0 ? formatSpeedAr(uploadSpeedBps) : "" })
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { dir: "ltr", className: "text-amber-300", children: uploading && uploadSpeedBps > 0 ? formatSpeedAr(uploadSpeedBps) : "" })
           ] }),
-          uploadError && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "bg-rose-500/10 border border-rose-500/30 rounded-lg p-2.5 text-rose-300 font-bold leading-relaxed", children: uploadError }),
-          uploadSuccessInfo?.githubRelease && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-3 text-emerald-200 space-y-1 text-[11px]", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "font-black", children: [
+          uploadError && /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "bg-rose-500/10 border border-rose-500/30 rounded-lg p-2.5 text-rose-300 font-bold leading-relaxed", children: uploadError }),
+          uploadSuccessInfo?.githubRelease && /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-3 text-emerald-200 space-y-1 text-[11px]", children: /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "font-black", children: [
             "\u2713 \u062A\u0645 \u0627\u0644\u0646\u0634\u0631 \u0631\u0633\u0645\u064A\u0627\u064B \u0639\u0644\u0649 GitHub Releases (",
             uploadSuccessInfo.githubRelease.releaseTag,
             ") \u0648\u062D\u0641\u0638 \u0627\u0644\u0633\u062C\u0644 \u0641\u064A Firestore!"
           ] }) })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
           "button",
           {
             type: "button",
             disabled: uploading || inspectingFile || !selectedFile || !inspection?.canPublish,
             onClick: handleStartUploadAndPublish,
             className: "w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 disabled:opacity-40 text-slate-950 font-black text-xs flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20 transition cursor-pointer",
-            children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { children: uploading ? "\u062C\u0627\u0631\u064D \u0627\u0644\u0631\u0641\u0639 \u0648\u0627\u0644\u062A\u062D\u0642\u0642 \u0648\u0627\u0644\u0646\u0634\u0631..." : "\u0631\u0641\u0639 \u0648\u0646\u0634\u0631 \u0627\u0644\u062A\u062D\u062F\u064A\u062B \u0639\u0628\u0631 GitHub Releases \u{1F680}" })
+            children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { children: uploading ? "\u062C\u0627\u0631\u064D \u0627\u0644\u0631\u0641\u0639 \u0648\u0627\u0644\u062A\u062D\u0642\u0642 \u0648\u0627\u0644\u0646\u0634\u0631..." : "\u0631\u0641\u0639 \u0648\u0646\u0634\u0631 \u0627\u0644\u062A\u062D\u062F\u064A\u062B \u0639\u0628\u0631 GitHub Releases \u{1F680}" })
           }
         )
       ] }),
-      publishTab === "external" && /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "space-y-4", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "bg-blue-500/10 border border-blue-500/30 rounded-xl p-3 text-xs text-blue-200 leading-relaxed", children: "\u{1F4A1} \u064A\u062A\u064A\u062D \u0647\u0630\u0627 \u0627\u0644\u062E\u064A\u0627\u0631 \u0646\u0634\u0631 \u062A\u062D\u062F\u064A\u062B \u0639\u0628\u0631 \u0631\u0627\u0628\u0637 \u062A\u0646\u0632\u064A\u0644 APK \u0645\u0628\u0627\u0634\u0631 \u0623\u0648 \u0627\u0633\u062A\u0636\u0627\u0641\u0629 \u062E\u0627\u0631\u062C\u064A\u0629 (Google Drive / CDN / Server) \u062F\u0648\u0646 \u0627\u0644\u062D\u0627\u062C\u0629 \u0644\u0631\u0641\u0639 \u0627\u0644\u062D\u0632\u0645\u0629 \u0625\u0644\u0649 GitHub Releases. \u064A\u062A\u0645 \u0641\u062A\u062D \u0627\u0644\u0631\u0627\u0628\u0637 \u0641\u064A \u0627\u0644\u0645\u062A\u0635\u0641\u062D \u0627\u0644\u062E\u0627\u0631\u062C\u064A \u0639\u0646\u062F \u0627\u0644\u0646\u0642\u0631 \u0639\u0644\u0649 \u0627\u0644\u062A\u062D\u0645\u064A\u0644." }),
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { children: [
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("label", { className: "block text-slate-300 font-bold mb-1.5", children: [
+      publishTab === "external" && /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "space-y-4", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "bg-blue-500/10 border border-blue-500/30 rounded-xl p-3 text-xs text-blue-200 leading-relaxed", children: "\u{1F4A1} \u064A\u062A\u064A\u062D \u0647\u0630\u0627 \u0627\u0644\u062E\u064A\u0627\u0631 \u0646\u0634\u0631 \u062A\u062D\u062F\u064A\u062B \u0639\u0628\u0631 \u0631\u0627\u0628\u0637 \u062A\u0646\u0632\u064A\u0644 APK \u0645\u0628\u0627\u0634\u0631 \u0623\u0648 \u0627\u0633\u062A\u0636\u0627\u0641\u0629 \u062E\u0627\u0631\u062C\u064A\u0629 (Google Drive / CDN / Server) \u062F\u0648\u0646 \u0627\u0644\u062D\u0627\u062C\u0629 \u0644\u0631\u0641\u0639 \u0627\u0644\u062D\u0632\u0645\u0629 \u0625\u0644\u0649 GitHub Releases. \u064A\u062A\u0645 \u0641\u062A\u062D \u0627\u0644\u0631\u0627\u0628\u0637 \u0641\u064A \u0627\u0644\u0645\u062A\u0635\u0641\u062D \u0627\u0644\u062E\u0627\u0631\u062C\u064A \u0639\u0646\u062F \u0627\u0644\u0646\u0642\u0631 \u0639\u0644\u0649 \u0627\u0644\u062A\u062D\u0645\u064A\u0644." }),
+        /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { children: [
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("label", { className: "block text-slate-300 font-bold mb-1.5", children: [
               "\u0627\u0633\u0645 \u0627\u0644\u0625\u0635\u062F\u0627\u0631 (",
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { dir: "ltr", className: "text-amber-300 font-['JetBrains_Mono',monospace]", children: "versionName" }),
+              /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { dir: "ltr", className: "text-amber-300 font-['JetBrains_Mono',monospace]", children: "versionName" }),
               "):"
             ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
               "input",
               {
                 type: "text",
@@ -6864,13 +7092,13 @@ function SamiAdminUpdatePanel({
               }
             )
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { children: [
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("label", { className: "block text-slate-300 font-bold mb-1.5", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { children: [
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("label", { className: "block text-slate-300 font-bold mb-1.5", children: [
               "\u0643\u0648\u062F \u0628\u0646\u0627\u0621 \u0627\u0644\u0625\u0635\u062F\u0627\u0631 (",
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { dir: "ltr", className: "text-amber-300 font-['JetBrains_Mono',monospace]", children: "versionCode" }),
+              /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { dir: "ltr", className: "text-amber-300 font-['JetBrains_Mono',monospace]", children: "versionCode" }),
               "):"
             ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
               "input",
               {
                 type: "number",
@@ -6882,19 +7110,19 @@ function SamiAdminUpdatePanel({
                 className: "w-full bg-[#0b0f17] border border-slate-700 rounded-xl p-3 text-slate-100 text-xs font-['JetBrains_Mono',monospace] focus:outline-none focus:border-amber-400"
               }
             ),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("span", { className: "block text-[10px] text-slate-500 mt-1", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("span", { className: "block text-[10px] text-slate-500 mt-1", children: [
               "\u0627\u0644\u0646\u0633\u062E\u0629 \u0627\u0644\u0645\u062B\u0628\u062A\u0629 \u062D\u0627\u0644\u064A\u0627\u064B: Build ",
               installedApp.versionCode
             ] })
           ] })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "text-xs", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("label", { className: "block text-slate-300 font-bold mb-1.5", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "text-xs", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("label", { className: "block text-slate-300 font-bold mb-1.5", children: [
             "\u0631\u0627\u0628\u0637 \u062A\u0646\u0632\u064A\u0644 \u0645\u0644\u0641 \u0627\u0644\u0640 APK \u0627\u0644\u0645\u0628\u0627\u0634\u0631 (",
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { dir: "ltr", className: "text-amber-300 font-['JetBrains_Mono',monospace]", children: "HTTPS URL" }),
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { dir: "ltr", className: "text-amber-300 font-['JetBrains_Mono',monospace]", children: "HTTPS URL" }),
             "):"
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
             "input",
             {
               type: "url",
@@ -6906,11 +7134,11 @@ function SamiAdminUpdatePanel({
               className: "w-full bg-[#0b0f17] border border-slate-700 rounded-xl p-3 text-slate-100 text-xs font-['JetBrains_Mono',monospace] focus:outline-none focus:border-amber-400"
             }
           ),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: `block text-[10px] mt-1 font-bold ${extDownloadUrl && !extDownloadUrl.startsWith("https://") ? "text-rose-400" : "text-slate-400"}`, children: extDownloadUrl && !extDownloadUrl.startsWith("https://") ? "\u26A0\uFE0F \u064A\u062C\u0628 \u0623\u0646 \u064A\u0628\u062F\u0623 \u0627\u0644\u0631\u0627\u0628\u0637 \u0628\u0640 https:// \u0644\u0636\u0645\u0627\u0646 \u0627\u0644\u0623\u0645\u0627\u0646 \u0648\u0641\u062A\u062D \u0627\u0644\u0645\u062A\u0635\u0641\u062D \u0628\u0646\u062C\u0627\u062D" : "\u0633\u064A\u062A\u0645 \u0641\u062A\u062D \u0647\u0630\u0627 \u0627\u0644\u0631\u0627\u0628\u0637 \u0641\u064A \u0645\u062A\u0635\u0641\u062D \u0627\u0644\u0646\u0638\u0627\u0645 \u0627\u0644\u062E\u0627\u0631\u062C\u064A \u0641\u0648\u0631 \u0646\u0642\u0631 \u0627\u0644\u0645\u0633\u062A\u062E\u062F\u0645 \u0639\u0644\u0649 \u0632\u0631 \u0627\u0644\u062A\u062D\u0645\u064A\u0644." })
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: `block text-[10px] mt-1 font-bold ${extDownloadUrl && !extDownloadUrl.startsWith("https://") ? "text-rose-400" : "text-slate-400"}`, children: extDownloadUrl && !extDownloadUrl.startsWith("https://") ? "\u26A0\uFE0F \u064A\u062C\u0628 \u0623\u0646 \u064A\u0628\u062F\u0623 \u0627\u0644\u0631\u0627\u0628\u0637 \u0628\u0640 https:// \u0644\u0636\u0645\u0627\u0646 \u0627\u0644\u0623\u0645\u0627\u0646 \u0648\u0641\u062A\u062D \u0627\u0644\u0645\u062A\u0635\u0641\u062D \u0628\u0646\u062C\u0627\u062D" : "\u0633\u064A\u062A\u0645 \u0641\u062A\u062D \u0647\u0630\u0627 \u0627\u0644\u0631\u0627\u0628\u0637 \u0641\u064A \u0645\u062A\u0635\u0641\u062D \u0627\u0644\u0646\u0638\u0627\u0645 \u0627\u0644\u062E\u0627\u0631\u062C\u064A \u0641\u0648\u0631 \u0646\u0642\u0631 \u0627\u0644\u0645\u0633\u062A\u062E\u062F\u0645 \u0639\u0644\u0649 \u0632\u0631 \u0627\u0644\u062A\u062D\u0645\u064A\u0644." })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "text-xs", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("label", { className: "block text-slate-300 font-bold mb-1.5", children: "\u0639\u0646\u0648\u0627\u0646 \u0627\u0644\u062A\u062D\u062F\u064A\u062B:" }),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+        /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "text-xs", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("label", { className: "block text-slate-300 font-bold mb-1.5", children: "\u0639\u0646\u0648\u0627\u0646 \u0627\u0644\u062A\u062D\u062F\u064A\u062B:" }),
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
             "input",
             {
               type: "text",
@@ -6922,9 +7150,9 @@ function SamiAdminUpdatePanel({
             }
           )
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "text-xs", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("label", { className: "block text-slate-300 font-bold mb-1.5", children: "\u0648\u0635\u0641 \u0627\u0644\u062A\u062D\u062F\u064A\u062B \u0648\u0645\u0627 \u0627\u0644\u062C\u062F\u064A\u062F (Release Notes):" }),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+        /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "text-xs", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("label", { className: "block text-slate-300 font-bold mb-1.5", children: "\u0648\u0635\u0641 \u0627\u0644\u062A\u062D\u062F\u064A\u062B \u0648\u0645\u0627 \u0627\u0644\u062C\u062F\u064A\u062F (Release Notes):" }),
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
             "textarea",
             {
               rows: 3,
@@ -6936,11 +7164,11 @@ function SamiAdminUpdatePanel({
             }
           )
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { children: [
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("label", { className: "block text-slate-300 font-bold mb-1.5", children: "\u0646\u0648\u0639 \u0627\u0644\u062A\u062D\u062F\u064A\u062B \u0644\u0644\u0645\u0633\u062A\u062E\u062F\u0645\u064A\u0646:" }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "grid grid-cols-2 gap-2", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+        /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { children: [
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("label", { className: "block text-slate-300 font-bold mb-1.5", children: "\u0646\u0648\u0639 \u0627\u0644\u062A\u062D\u062F\u064A\u062B \u0644\u0644\u0645\u0633\u062A\u062E\u062F\u0645\u064A\u0646:" }),
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "grid grid-cols-2 gap-2", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
                 "button",
                 {
                   type: "button",
@@ -6950,7 +7178,7 @@ function SamiAdminUpdatePanel({
                   children: "\u0627\u062E\u062A\u064A\u0627\u0631\u064A (\u0645\u0639 \xAB\u0644\u0627\u062D\u0642\u064B\u0627\xBB)"
                 }
               ),
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+              /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
                 "button",
                 {
                   type: "button",
@@ -6962,10 +7190,10 @@ function SamiAdminUpdatePanel({
               )
             ] })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { children: [
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("label", { className: "block text-slate-300 font-bold mb-1.5", children: "\u062D\u0627\u0644\u0629 \u062A\u0648\u0632\u064A\u0639 \u0627\u0644\u0625\u0635\u062F\u0627\u0631 \u0639\u0646\u062F \u0627\u0644\u0646\u0634\u0631:" }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "grid grid-cols-2 gap-2", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { children: [
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("label", { className: "block text-slate-300 font-bold mb-1.5", children: "\u062D\u0627\u0644\u0629 \u062A\u0648\u0632\u064A\u0639 \u0627\u0644\u0625\u0635\u062F\u0627\u0631 \u0639\u0646\u062F \u0627\u0644\u0646\u0634\u0631:" }),
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "grid grid-cols-2 gap-2", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
                 "button",
                 {
                   type: "button",
@@ -6975,7 +7203,7 @@ function SamiAdminUpdatePanel({
                   children: "\u0645\u0641\u0639\u0651\u0644 \u0644\u0644\u062A\u0648\u0632\u064A\u0639 \u0641\u0648\u0631\u0627\u064B"
                 }
               ),
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+              /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
                 "button",
                 {
                   type: "button",
@@ -6988,18 +7216,18 @@ function SamiAdminUpdatePanel({
             ] })
           ] })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
           "button",
           {
             type: "button",
             disabled: extPublishing || !extVersionName || !extVersionCode || !extDownloadUrl,
             onClick: handlePublishExternalUpdate,
             className: "w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 disabled:opacity-40 text-slate-950 font-black text-xs flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20 transition cursor-pointer",
-            children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { children: extPublishing ? "\u062C\u0627\u0631\u064D \u0646\u0634\u0631 \u0627\u0644\u062A\u062D\u062F\u064A\u062B \u0628\u0627\u0644\u0631\u0627\u0628\u0637 \u0627\u0644\u062E\u0627\u0631\u062C\u064A..." : "\u0646\u0634\u0631 \u062A\u062D\u062F\u064A\u062B APK \u0628\u0627\u0644\u0631\u0627\u0628\u0637 \u0627\u0644\u062E\u0627\u0631\u062C\u064A \u{1F680}" })
+            children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { children: extPublishing ? "\u062C\u0627\u0631\u064D \u0646\u0634\u0631 \u0627\u0644\u062A\u062D\u062F\u064A\u062B \u0628\u0627\u0644\u0631\u0627\u0628\u0637 \u0627\u0644\u062E\u0627\u0631\u062C\u064A..." : "\u0646\u0634\u0631 \u062A\u062D\u062F\u064A\u062B APK \u0628\u0627\u0644\u0631\u0627\u0628\u0637 \u0627\u0644\u062E\u0627\u0631\u062C\u064A \u{1F680}" })
           }
         )
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "pt-2 border-t border-slate-800", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "pt-2 border-t border-slate-800", children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
         "button",
         {
           type: "button",
@@ -7009,32 +7237,32 @@ function SamiAdminUpdatePanel({
         }
       ) })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "bg-[#121824] border border-slate-800 rounded-2xl p-5 space-y-4 shadow-xl", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "flex items-center justify-between", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { children: [
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("h4", { className: "text-xs font-black text-amber-400", children: "\u0633\u062C\u0644 \u0627\u0644\u0625\u0635\u062F\u0627\u0631\u0627\u062A \u0648\u0627\u0644\u062A\u062D\u0643\u0645 \u0627\u0644\u0645\u0633\u062A\u0642\u0644 \u0641\u064A \u062A\u0648\u0632\u064A\u0639 \u0643\u0644 \u062A\u062D\u062F\u064A\u062B" }),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("p", { className: "text-[11px] text-slate-400 mt-0.5", children: "\u0643\u0644 \u0625\u0635\u062F\u0627\u0631 \u064A\u0645\u062A\u0644\u0643 \u0645\u0641\u062A\u0627\u062D \u062A\u0641\u0639\u064A\u0644/\u062A\u0639\u0637\u064A\u0644 \u0645\u0633\u062A\u0642\u0644 \u062A\u0645\u0627\u0645\u0627\u064B\u060C \u0645\u0639 \u062A\u0639\u062F\u064A\u0644 \u0631\u0627\u0628\u0637 \u0627\u0644\u062A\u0646\u0632\u064A\u0644 \u0644\u0644\u0625\u0635\u062F\u0627\u0631\u0627\u062A \u0627\u0644\u062E\u0627\u0631\u062C\u064A\u0629" })
+    /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "bg-[#121824] border border-slate-800 rounded-2xl p-5 space-y-4 shadow-xl", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex items-center justify-between", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("h4", { className: "text-xs font-black text-amber-400", children: "\u0633\u062C\u0644 \u0627\u0644\u0625\u0635\u062F\u0627\u0631\u0627\u062A \u0648\u0627\u0644\u062A\u062D\u0643\u0645 \u0627\u0644\u0645\u0633\u062A\u0642\u0644 \u0641\u064A \u062A\u0648\u0632\u064A\u0639 \u0643\u0644 \u062A\u062D\u062F\u064A\u062B" }),
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("p", { className: "text-[11px] text-slate-400 mt-0.5", children: "\u0643\u0644 \u0625\u0635\u062F\u0627\u0631 \u064A\u0645\u062A\u0644\u0643 \u0645\u0641\u062A\u0627\u062D \u062A\u0641\u0639\u064A\u0644/\u062A\u0639\u0637\u064A\u0644 \u0645\u0633\u062A\u0642\u0644 \u062A\u0645\u0627\u0645\u0627\u064B\u060C \u0645\u0639 \u062A\u0639\u062F\u064A\u0644 \u0631\u0627\u0628\u0637 \u0627\u0644\u062A\u0646\u0632\u064A\u0644 \u0644\u0644\u0625\u0635\u062F\u0627\u0631\u0627\u062A \u0627\u0644\u062E\u0627\u0631\u062C\u064A\u0629" })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("span", { className: "text-[11px] text-slate-400 font-['JetBrains_Mono',monospace] tabular-nums", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("span", { className: "text-[11px] text-slate-400 font-['JetBrains_Mono',monospace] tabular-nums", children: [
           historyList.length,
           " \u0625\u0635\u062F\u0627\u0631"
         ] })
       ] }),
-      historyList.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("p", { className: "text-xs text-slate-400 py-3 text-center", children: "\u0644\u0627 \u062A\u0648\u062C\u062F \u0633\u062C\u0644\u0627\u062A \u0625\u0635\u062F\u0627\u0631\u0627\u062A \u0645\u062D\u0641\u0648\u0638\u0629 \u0628\u0639\u062F." }) : /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "space-y-3 max-h-96 overflow-y-auto pr-1", children: historyList.map((item) => {
+      historyList.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("p", { className: "text-xs text-slate-400 py-3 text-center", children: "\u0644\u0627 \u062A\u0648\u062C\u062F \u0633\u062C\u0644\u0627\u062A \u0625\u0635\u062F\u0627\u0631\u0627\u062A \u0645\u062D\u0641\u0648\u0638\u0629 \u0628\u0639\u062F." }) : /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "space-y-3 max-h-96 overflow-y-auto pr-1", children: historyList.map((item) => {
         const isExternal = item.deliveryMethod === "external_url" || item.storageSource === "external_url" || Boolean(item.externalDownloadUrl) && !item.githubReleaseId;
         const isEligible = item.isEligibleForDistribution === true;
         const isItemActive = item.isActive !== false && item.distributionStatus !== "disabled";
         const downloadUrl = (item.externalDownloadUrl || item.downloadUrl || "").trim();
         const targetId = item.id || item.updateId || item.versionCode;
         const isTogglingThis = togglingUpdateId === targetId;
-        return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(
+        return /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(
           "div",
           {
             className: `bg-[#0b0f17] border rounded-xl p-3.5 space-y-2.5 text-xs transition ${isItemActive ? "border-slate-700/80" : "border-slate-800 opacity-80"}`,
             children: [
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "flex flex-wrap items-center justify-between gap-2 border-b border-slate-800/80 pb-2", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "flex flex-wrap items-center gap-2", children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(
+              /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex flex-wrap items-center justify-between gap-2 border-b border-slate-800/80 pb-2", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex flex-wrap items-center gap-2", children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(
                     "span",
                     {
                       dir: "ltr",
@@ -7045,41 +7273,41 @@ function SamiAdminUpdatePanel({
                       ]
                     }
                   ),
-                  /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("span", { className: "text-[10px] text-slate-400 font-['JetBrains_Mono',monospace] tabular-nums", children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("span", { className: "text-[10px] text-slate-400 font-['JetBrains_Mono',monospace] tabular-nums", children: [
                     "Build ",
                     item.versionCode
                   ] }),
-                  /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+                  /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
                     "span",
                     {
                       className: `text-[10px] font-black px-2 py-0.5 rounded border ${isExternal ? "bg-sky-500/15 border-sky-500/40 text-sky-300" : "bg-purple-500/15 border-purple-500/40 text-purple-300"}`,
                       children: isExternal ? "\u{1F310} \u0631\u0627\u0628\u0637 \u062E\u0627\u0631\u062C\u064A" : "\u{1F4E6} GitHub Release"
                     }
                   ),
-                  /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+                  /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
                     "span",
                     {
                       className: `text-[10px] font-black px-2 py-0.5 rounded border ${isEligible ? "bg-emerald-500/15 border-emerald-500/40 text-emerald-300" : "bg-slate-800 border-slate-700 text-slate-400"}`,
                       children: isEligible ? "\u0645\u0624\u0647\u0644 \u0644\u0644\u062A\u0648\u0632\u064A\u0639 \u0644\u0644\u0645\u0633\u062A\u062E\u062F\u0645\u064A\u0646 \u2713" : "\u0625\u0635\u062F\u0627\u0631 \u0633\u0627\u0628\u0642 / \u063A\u064A\u0631 \u0645\u0624\u0647\u0644 \u2717"
                     }
                   ),
-                  /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+                  /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
                     "span",
                     {
                       className: `text-[10px] font-black px-2 py-0.5 rounded border ${isItemActive ? "bg-emerald-500/15 border-emerald-500/40 text-emerald-300" : "bg-rose-500/15 border-rose-500/40 text-rose-300"}`,
                       children: isItemActive ? "\u0645\u0641\u0639\u0651\u0644 \u0644\u0644\u062A\u0648\u0632\u064A\u0639" : "\u0645\u0639\u0637\u0651\u0644 \u0644\u0644\u062A\u0648\u0632\u064A\u0639"
                     }
                   ),
-                  /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "text-[10px] text-slate-400 font-bold", children: item.isMandatory ? "\u0625\u0644\u0632\u0627\u0645\u064A" : "\u0627\u062E\u062A\u064A\u0627\u0631\u064A" })
+                  /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "text-[10px] text-slate-400 font-bold", children: item.isMandatory ? "\u0625\u0644\u0632\u0627\u0645\u064A" : "\u0627\u062E\u062A\u064A\u0627\u0631\u064A" })
                 ] }),
-                item.releaseTag && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { dir: "ltr", className: "text-[10px] text-amber-300 font-['JetBrains_Mono',monospace]", children: item.releaseTag })
+                item.releaseTag && /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { dir: "ltr", className: "text-[10px] text-amber-300 font-['JetBrains_Mono',monospace]", children: item.releaseTag })
               ] }),
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "space-y-1 text-[11px] text-slate-300 leading-relaxed", children: [
-                item.title && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "font-bold text-amber-300/90", children: item.title }),
-                item.description && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("p", { className: "text-slate-400", children: item.description }),
-                isExternal && downloadUrl && /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "flex items-center gap-1.5 pt-0.5", children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "text-slate-500", children: "\u0627\u0644\u0631\u0627\u0628\u0637:" }),
-                  /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+              /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "space-y-1 text-[11px] text-slate-300 leading-relaxed", children: [
+                item.title && /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "font-bold text-amber-300/90", children: item.title }),
+                item.description && /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("p", { className: "text-slate-400", children: item.description }),
+                isExternal && downloadUrl && /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex items-center gap-1.5 pt-0.5", children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "text-slate-500", children: "\u0627\u0644\u0631\u0627\u0628\u0637:" }),
+                  /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
                     "span",
                     {
                       dir: "ltr",
@@ -7089,9 +7317,9 @@ function SamiAdminUpdatePanel({
                   )
                 ] })
               ] }),
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-slate-800/60", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "flex items-center gap-2", children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+              /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-slate-800/60", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex items-center gap-2", children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
                     "button",
                     {
                       type: "button",
@@ -7101,7 +7329,7 @@ function SamiAdminUpdatePanel({
                       children: isTogglingThis ? "\u062C\u0627\u0631\u064D \u0627\u0644\u062A\u062D\u062F\u064A\u062B..." : isItemActive ? "\u23F8\uFE0F \u0625\u064A\u0642\u0627\u0641 \u062A\u0648\u0632\u064A\u0639 \u0647\u0630\u0627 \u0627\u0644\u062A\u062D\u062F\u064A\u062B" : "\u25B6\uFE0F \u062A\u0641\u0639\u064A\u0644 \u062A\u0648\u0632\u064A\u0639 \u0647\u0630\u0627 \u0627\u0644\u062A\u062D\u062F\u064A\u062B"
                     }
                   ),
-                  isExternal && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+                  isExternal && /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
                     "button",
                     {
                       type: "button",
@@ -7118,7 +7346,7 @@ function SamiAdminUpdatePanel({
                     }
                   )
                 ] }),
-                !isExternal && item.storageSource === "github_releases" && !isItemActive && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+                !isExternal && item.storageSource === "github_releases" && !isItemActive && /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
                   "button",
                   {
                     type: "button",
@@ -7135,19 +7363,19 @@ function SamiAdminUpdatePanel({
         );
       }) })
     ] }),
-    editingUrlItem && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+    editingUrlItem && /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
       "div",
       {
         dir: "rtl",
         className: "fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4",
-        children: /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "w-full max-w-lg bg-[#0b0f19] border border-amber-400/40 rounded-2xl p-6 space-y-4 shadow-2xl text-right", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "flex items-center justify-between border-b border-slate-800 pb-3", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("h3", { className: "text-sm font-black text-amber-300", children: [
+        children: /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "w-full max-w-lg bg-[#0b0f19] border border-amber-400/40 rounded-2xl p-6 space-y-4 shadow-2xl text-right", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex items-center justify-between border-b border-slate-800 pb-3", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("h3", { className: "text-sm font-black text-amber-300", children: [
               "\u062A\u0639\u062F\u064A\u0644 \u0631\u0627\u0628\u0637 \u062A\u0646\u0632\u064A\u0644 APK \u0627\u0644\u062E\u0627\u0631\u062C\u064A (Build ",
               editingUrlItem.versionCode,
               ")"
             ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
               "button",
               {
                 type: "button",
@@ -7157,13 +7385,13 @@ function SamiAdminUpdatePanel({
               }
             )
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "space-y-2 text-xs", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("label", { className: "block text-slate-300 font-bold", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "space-y-2 text-xs", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("label", { className: "block text-slate-300 font-bold", children: [
               "\u0631\u0627\u0628\u0637 \u062A\u0646\u0632\u064A\u0644 APK \u0627\u0644\u062C\u062F\u064A\u062F (",
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { dir: "ltr", className: "text-amber-300 font-['JetBrains_Mono',monospace]", children: "HTTPS" }),
+              /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { dir: "ltr", className: "text-amber-300 font-['JetBrains_Mono',monospace]", children: "HTTPS" }),
               "):"
             ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
               "input",
               {
                 type: "url",
@@ -7175,10 +7403,10 @@ function SamiAdminUpdatePanel({
                 className: "w-full bg-[#080c14] border border-slate-700 rounded-xl p-3 text-slate-100 text-xs font-['JetBrains_Mono',monospace] focus:outline-none focus:border-amber-400"
               }
             ),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: `block text-[10px] ${newUrlInput && !newUrlInput.startsWith("https://") ? "text-rose-400 font-bold" : "text-slate-400"}`, children: newUrlInput && !newUrlInput.startsWith("https://") ? "\u26A0\uFE0F \u064A\u062C\u0628 \u0623\u0646 \u064A\u0628\u062F\u0623 \u0627\u0644\u0631\u0627\u0628\u0637 \u0628\u0640 https://" : "\u0633\u064A\u062A\u0645 \u062A\u062D\u062F\u064A\u062B \u0627\u0644\u0631\u0627\u0628\u0637 \u0641\u0648\u0631\u0627\u064B \u0648\u062D\u0641\u0638\u0647 \u0641\u064A \u0633\u062C\u0644\u0627\u062A \u0627\u0644\u0646\u0638\u0627\u0645 \u0648\u0633\u064A\u062A\u0644\u0642\u0627\u0647 \u0627\u0644\u0645\u0633\u062A\u062E\u062F\u0645\u0648\u0646 \u0639\u0646\u062F \u0641\u062A\u062D \u0627\u0644\u0631\u0627\u0628\u0637." })
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: `block text-[10px] ${newUrlInput && !newUrlInput.startsWith("https://") ? "text-rose-400 font-bold" : "text-slate-400"}`, children: newUrlInput && !newUrlInput.startsWith("https://") ? "\u26A0\uFE0F \u064A\u062C\u0628 \u0623\u0646 \u064A\u0628\u062F\u0623 \u0627\u0644\u0631\u0627\u0628\u0637 \u0628\u0640 https://" : "\u0633\u064A\u062A\u0645 \u062A\u062D\u062F\u064A\u062B \u0627\u0644\u0631\u0627\u0628\u0637 \u0641\u0648\u0631\u0627\u064B \u0648\u062D\u0641\u0638\u0647 \u0641\u064A \u0633\u062C\u0644\u0627\u062A \u0627\u0644\u0646\u0638\u0627\u0645 \u0648\u0633\u064A\u062A\u0644\u0642\u0627\u0647 \u0627\u0644\u0645\u0633\u062A\u062E\u062F\u0645\u0648\u0646 \u0639\u0646\u062F \u0641\u062A\u062D \u0627\u0644\u0631\u0627\u0628\u0637." })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "flex items-center justify-end gap-2 pt-2 border-t border-slate-800", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex items-center justify-end gap-2 pt-2 border-t border-slate-800", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
               "button",
               {
                 type: "button",
@@ -7188,7 +7416,7 @@ function SamiAdminUpdatePanel({
                 children: "\u0625\u0644\u063A\u0627\u0621"
               }
             ),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
               "button",
               {
                 type: "button",
@@ -7202,7 +7430,7 @@ function SamiAdminUpdatePanel({
         ] })
       }
     ),
-    showPreviewModal && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+    showPreviewModal && /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
       SamiUserUpdateModal,
       {
         isOpen: showPreviewModal,
@@ -7244,22 +7472,47 @@ if (typeof window !== "undefined") {
   w.getInstalledSamiAppInfo = getInstalledSamiAppInfo;
   w.getSamiServerBaseUrl = getSamiServerBaseUrl;
   w.SamiChannelMembersModal = SamiChannelMembersModal;
+  w.SamiEmojiBar = SamiEmojiBar;
+  w.SamiMessageReactions = SamiMessageReactions;
+  w.SamiPinButton = SamiPinButton;
+  w.SamiPinnedBanner = SamiPinnedBanner;
+  w.samiToggleReaction = toggleMessageReaction;
+  w.samiTogglePin = toggleMessagePin;
+  w.SAMI_EMOJIS = SAMI_EMOJIS;
 }
 export {
+  SAMI_EMOJIS,
   SAMI_EXPECTED_APP_ID,
   SAMI_FALLBACK_VERSION_CODE,
   SAMI_FALLBACK_VERSION_NAME,
   SamiAdminUpdatePanel,
   SamiChannelMembersModal,
+  SamiEmojiBar,
+  SamiMessageReactions,
+  SamiPinButton,
+  SamiPinnedBanner,
   SamiUserUpdateModal,
   getInstalledSamiAppInfo,
   getSamiServerBaseUrl,
   isAndroidLocalAssetOrigin,
   openInExternalBrowser,
   sanitizeProductionServerUrl,
-  shouldShowCloudAppUpdate
+  shouldShowCloudAppUpdate,
+  toggleMessagePin,
+  toggleMessageReaction
 };
 /*! Bundled license information:
+
+react/cjs/react.development.js:
+  (**
+   * @license React
+   * react.development.js
+   *
+   * Copyright (c) Meta Platforms, Inc. and affiliates.
+   *
+   * This source code is licensed under the MIT license found in the
+   * LICENSE file in the root directory of this source tree.
+   *)
 
 jszip/dist/jszip.min.js:
   (*!
@@ -7273,17 +7526,6 @@ jszip/dist/jszip.min.js:
   JSZip uses the library pako released under the MIT license :
   https://github.com/nodeca/pako/blob/main/LICENSE
   *)
-
-react/cjs/react.development.js:
-  (**
-   * @license React
-   * react.development.js
-   *
-   * Copyright (c) Meta Platforms, Inc. and affiliates.
-   *
-   * This source code is licensed under the MIT license found in the
-   * LICENSE file in the root directory of this source tree.
-   *)
 
 react/cjs/react-jsx-runtime.development.js:
   (**

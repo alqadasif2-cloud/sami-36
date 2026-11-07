@@ -60,8 +60,11 @@ service cloud.firestore {
     // 4. Flat Community Chat (Used for public trading chat on Android)
     match /chat_messages/{messageId} {
       allow get, list: if true;
-      allow create: if request.resource.data.text is string && request.resource.data.text.size() <= 2000;
-      allow update, delete: if false;
+      allow create: if (
+        !('text' in request.resource.data) || (request.resource.data.text is string && request.resource.data.text.size() <= 4000)
+      );
+      allow update: if request.resource.data.diff(resource.data).affectedKeys().hasOnly(['reactions', 'isPinned', 'pinned', 'pinnedBy', 'pinnedAt']);
+      allow delete: if false;
     }
 
     // 5. Direct Private Messages & Private Conversations

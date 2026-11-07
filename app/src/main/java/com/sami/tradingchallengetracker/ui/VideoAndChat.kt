@@ -279,6 +279,12 @@ fun AndroidLoginScreen(
     }
 }
 
+data class AndroidChatReplyInfo(
+    val id: String,
+    val senderName: String,
+    val text: String?
+)
+
 data class AndroidChatMessage(
     val id: String,
     val senderId: Int,
@@ -286,8 +292,13 @@ data class AndroidChatMessage(
     val text: String?,
     val imageUrl: String?,
     val storagePath: String?,
-    val timestamp: Long
+    val timestamp: Long,
+    val replyTo: AndroidChatReplyInfo? = null,
+    val reactions: Map<String, List<Int>> = emptyMap(),
+    val isPinned: Boolean = false
 )
+
+val SAMI_EMOJI_REACTIONS = listOf("❤️", "😂", "👍", "🔥", "👏", "😮")
 
 /**
  * Deterministic high-contrast color palette for user names on dark backgrounds.
@@ -336,11 +347,15 @@ fun getUserNameColor(userId: String): Color {
 }
 
 /**
- * Cloud Group Chat Screen: 💬 دفعة الرحلة إلى 3000$
- * - Real-time sync via Firebase Firestore (`chat_messages`)
- * - Cloud image storage via Firebase Storage (`chat_images`)
- * - Supports text, Gallery images, and Camera capture
- * - Auto-deletes messages and images older than 48 hours
+ * Sami Modern Premium Messenger Chat Screen
+ * - Modern Luxury Visual Identity (Black #050811, Navy #0D131F/#152238, Gold #FFD700)
+ * - Modern Message Bubbles with tailored soft borders & grouped radii
+ * - Emoji Reactions System (❤️, 😂, 👍, 🔥, 👏, 😮) with single reaction enforcement per user
+ * - Modern Reply System with quote preview & smooth scroll-to-message
+ * - Pinned Message Banner with header quick-jump & authority enforcement
+ * - In-Chat Live Search with filter highlight
+ * - Real Pagination with batch fetching
+ * - Real-time Firestore Sync & Optimistic UI
  */
 @Composable
 fun AndroidGroupChatScreen(
@@ -355,10 +370,20 @@ fun AndroidGroupChatScreen(
     var isSending by remember { mutableStateOf(false) }
     var alertBanner by remember { mutableStateOf<String?>(null) }
 
-    val messages = remember { mutableStateListOf<AndroidChatMessage>() }
+    // Messenger Modern Features State
+    var activeReplyTo by remember { mutableStateOf<AndroidChatReplyInfo?>(null) }
+    var selectedMessageForMenu by remember { mutableStateOf<AndroidChatMessage?>(null) }
+    var reactionsDetailsForMessage by remember { mutableStateOf<AndroidChatMessage?>(null) }
+    var searchQuery by remember { mutableStateOf("") }
+    var isSearchOpen by remember { mutableStateOf(false) }
+    var highlightedMessageId by remember { mutableStateOf<String?>(null) }
+    var messageLimit by remember { mutableStateOf(35) }
+
+    val isLeaderOrMod = currentUser.id == 1 || currentUser.username.equals("Sami", ignoreCase = true)
+
+    val allMessages = remember { mutableStateListOf<AndroidChatMessage>() }
     val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
-    val fortyEightHoursMs = 48L * 3600L * 1000L
 
     // Monitor network connectivity changes
     DisposableEffect(context) {
@@ -373,22 +398,20 @@ fun AndroidGroupChatScreen(
         }
         try {
             cm?.registerDefaultNetworkCallback(callback)
-        } catch (_: Exception) {
-        }
+        } catch (_: Exception) {}
         onDispose {
             try {
                 cm?.unregisterNetworkCallback(callback)
-            } catch (_: Exception) {
-            }
+            } catch (_: Exception) {}
         }
     }
 
-    // Subscribe to Firebase Firestore `chat_messages` in real-time with safety limit
-    DisposableEffect(Unit) {
+    // Subscribe to Firebase Firestore `chat_messages` in real-time with pagination limit
+    DisposableEffect(messageLimit) {
         val db = FirebaseCloudHelper.getFirestore(context)
         val registration = db.collection("chat_messages")
             .orderBy("timestamp", com.google.firebase.firestore.Query.Direction.DESCENDING)
-            .limit(35)
+            .limit(messageLimit.toLong())
             .addSnapshotListener { snapshot, error ->
                 if (error != null) {
                     val errStr = error.message ?: ""
@@ -404,6 +427,27 @@ fun AndroidGroupChatScreen(
                 val now = System.currentTimeMillis()
                 val validList = mutableListOf<AndroidChatMessage>()
                 for (doc in snapshot.documents) {
+                    val replyObj = doc.get("replyTo") as? Map<*, *>
+                    val replyInfo = if (replyObj != null) {
+                        AndroidChatReplyInfo(
+                            id = replyObj["id"]?.toString() ?: "",
+                            senderName = replyObj["senderName"]?.toString() ?: "",
+                            text = replyObj["text"]?.toString()
+                        )
+                    } else null
+
+                    val rawReactions = doc.get("reactions") as? Map<*, *>
+                    val parsedReactions = mutableMapOf<String, List<Int>>()
+                    if (rawReactions != null) {
+                        for ((k, v) in rawReactions) {
+                            if (k is String && v is List<*>) {
+                                parsedReactions[k] = v.mapNotNull { (it as? Number)?.toInt() }
+                            }
+                        }
+                    }
+
+                    val pinned = doc.getBoolean("isPinned") ?: doc.getBoolean("pinned") ?: false
+
                     val msg = AndroidChatMessage(
                         id = doc.getString("id") ?: doc.id,
                         senderId = (doc.getLong("senderId") ?: 0L).toInt(),
@@ -411,25 +455,40 @@ fun AndroidGroupChatScreen(
                         text = doc.getString("text"),
                         imageUrl = doc.getString("imageUrl"),
                         storagePath = doc.getString("storagePath"),
-                        timestamp = doc.getLong("timestamp") ?: now
+                        timestamp = doc.getLong("timestamp") ?: now,
+                        replyTo = replyInfo,
+                        reactions = parsedReactions,
+                        isPinned = pinned
                     )
                     validList.add(msg)
                 }
 
-                // Preserve all message history with deterministic secondary sorting by ID
+                // Deterministic chronological ordering (oldest to newest)
                 validList.sortWith(compareBy({ it.timestamp }, { it.id }))
-                messages.clear()
-                messages.addAll(validList)
+                allMessages.clear()
+                allMessages.addAll(validList)
             }
         onDispose {
             registration.remove()
         }
     }
 
-    // Auto-scroll to latest message
-    LaunchedEffect(messages.size) {
-        if (messages.isNotEmpty()) {
-            listState.animateScrollToItem(messages.size - 1)
+    // Filter messages if search is active
+    val displayedMessages = remember(allMessages.toList(), searchQuery) {
+        if (searchQuery.isBlank()) {
+            allMessages
+        } else {
+            allMessages.filter {
+                (it.text?.contains(searchQuery, ignoreCase = true) == true) ||
+                it.senderName.contains(searchQuery, ignoreCase = true)
+            }
+        }
+    }
+
+    // Auto-scroll to latest message on new message when not searching
+    LaunchedEffect(allMessages.size) {
+        if (allMessages.isNotEmpty() && searchQuery.isBlank()) {
+            listState.animateScrollToItem(allMessages.size - 1)
         }
     }
 
@@ -466,72 +525,266 @@ fun AndroidGroupChatScreen(
         }
     }
 
+    // Reaction Toggle Function (enforcing 1 reaction per user across all emojis)
+    fun toggleReaction(msg: AndroidChatMessage, emoji: String) {
+        val currentReactions = msg.reactions.toMutableMap()
+        val uid = currentUser.id
+        val hadThisEmoji = currentReactions[emoji]?.contains(uid) == true
+
+        // Remove user from all other emojis to prevent duplicate reaction
+        for ((k, list) in currentReactions.entries.toList()) {
+            if (list.contains(uid)) {
+                val filtered = list.filter { it != uid }
+                if (filtered.isEmpty()) {
+                    currentReactions.remove(k)
+                } else {
+                    currentReactions[k] = filtered
+                }
+            }
+        }
+
+        // If user didn't already have this emoji, add it
+        if (!hadThisEmoji) {
+            val currentList = (currentReactions[emoji] ?: emptyList()) + uid
+            currentReactions[emoji] = currentList
+        }
+
+        // Update in Firestore
+        coroutineScope.launch {
+            try {
+                FirebaseCloudHelper.getFirestore(context)
+                    .collection("chat_messages")
+                    .document(msg.id)
+                    .update("reactions", currentReactions)
+                    .await()
+            } catch (_: Exception) {}
+        }
+    }
+
+    // Pin Toggle Function (only for leader/moderator)
+    fun togglePin(msg: AndroidChatMessage) {
+        val nextPinned = !msg.isPinned
+        coroutineScope.launch {
+            try {
+                FirebaseCloudHelper.getFirestore(context)
+                    .collection("chat_messages")
+                    .document(msg.id)
+                    .update(
+                        mapOf(
+                            "isPinned" to nextPinned,
+                            "pinnedAt" to System.currentTimeMillis(),
+                            "pinnedBy" to currentUser.id
+                        )
+                    )
+                    .await()
+            } catch (_: Exception) {}
+        }
+    }
+
+    val pinnedMessage = remember(allMessages.toList()) {
+        allMessages.lastOrNull { it.isPinned }
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF070A10))
+            .background(Color(0xFF050811))
     ) {
-        // Chat Header
+        // Luxury Messenger Header
         Surface(
             color = Color(0xFF0D131F),
-            shadowElevation = 4.dp,
+            shadowElevation = 6.dp,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Box(
-                        modifier = Modifier
-                            .size(40.dp)
-                            .clip(RoundedCornerShape(12.dp))
-                            .background(Color(0xFFFFD700)),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text("💬", fontSize = 20.sp)
+            Column {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 14.dp, vertical = 12.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Box(
+                            modifier = Modifier
+                                .size(42.dp)
+                                .clip(RoundedCornerShape(12.dp))
+                                .background(Color(0xFF152238))
+                                .border(1.dp, Color(0xFFFFD700).copy(alpha = 0.5f), RoundedCornerShape(12.dp)),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text("👑", fontSize = 20.sp)
+                        }
+                        Spacer(modifier = Modifier.width(10.dp))
+                        Column {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text(
+                                    text = "دفعة الرحلة إلى 3000$",
+                                    fontSize = 15.sp,
+                                    fontWeight = FontWeight.Black,
+                                    color = Color.White
+                                )
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Box(
+                                    modifier = Modifier
+                                        .size(8.dp)
+                                        .clip(CircleShape)
+                                        .background(if (isOnline) Color(0xFF10B981) else Color(0xFFEF4444))
+                                )
+                            }
+                            Text(
+                                text = if (isOnline) "متصل الآن • حذف تلقائي 48 ساعة" else "غير متصل بالإنترنت",
+                                fontSize = 11.sp,
+                                color = if (isOnline) Color(0xFF94A3B8) else Color(0xFFF87171)
+                            )
+                        }
                     }
-                    Spacer(modifier = Modifier.width(12.dp))
-                    Column {
-                        Text(
-                            text = "دفعة الرحلة إلى 3000$",
-                            fontSize = 15.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.White
-                        )
-                        Text(
-                            text = "20 عضواً • حذف تلقائي بعد 48 ساعة",
-                            fontSize = 11.sp,
-                            color = Color.Gray
-                        )
+
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        // In-chat Search Toggle
+                        IconButton(
+                            onClick = {
+                                isSearchOpen = !isSearchOpen
+                                if (!isSearchOpen) searchQuery = ""
+                            },
+                            modifier = Modifier.size(36.dp)
+                        ) {
+                            Icon(
+                                Icons.Default.Search,
+                                contentDescription = "بحث",
+                                tint = if (isSearchOpen || searchQuery.isNotBlank()) Color(0xFFFFD700) else Color(0xFF94A3B8),
+                                modifier = Modifier.size(20.dp)
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.width(4.dp))
+
+                        // User profile pill
+                        Surface(
+                            color = Color(0xFF141D30),
+                            shape = RoundedCornerShape(50),
+                            border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFFFD700).copy(alpha = 0.4f))
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(
+                                    Icons.Default.Person,
+                                    contentDescription = null,
+                                    tint = Color(0xFFFFD700),
+                                    modifier = Modifier.size(13.dp)
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text(
+                                    text = currentUser.displayName,
+                                    color = Color(0xFFFFD700),
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                        }
                     }
                 }
 
-                Surface(
-                    color = Color(0xFF1E293B),
-                    shape = RoundedCornerShape(50),
-                    border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF334155))
-                ) {
-                    Row(
-                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                // In-Chat Search Bar
+                if (isSearchOpen) {
+                    Surface(
+                        color = Color(0xFF090E17),
+                        modifier = Modifier.fillMaxWidth()
                     ) {
-                        Icon(
-                            Icons.Default.Person,
-                            contentDescription = null,
-                            tint = Color(0xFFFFD700),
-                            modifier = Modifier.size(14.dp)
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(
-                            text = currentUser.displayName,
-                            color = Color(0xFFFFD700),
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.Bold
-                        )
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 12.dp, vertical = 6.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            OutlinedTextField(
+                                value = searchQuery,
+                                onValueChange = { searchQuery = it },
+                                placeholder = {
+                                    Text("ابحث في رسائل المحادثة...", fontSize = 12.sp, color = Color(0xFF64748B))
+                                },
+                                singleLine = true,
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = Color(0xFFFFD700),
+                                    unfocusedBorderColor = Color(0xFF334155),
+                                    focusedTextColor = Color.White,
+                                    unfocusedTextColor = Color.White
+                                ),
+                                modifier = Modifier.weight(1f)
+                            )
+                            if (searchQuery.isNotBlank()) {
+                                IconButton(onClick = { searchQuery = "" }) {
+                                    Icon(Icons.Default.Close, contentDescription = "مسح", tint = Color.LightGray)
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // Pinned Message Banner
+                if (pinnedMessage != null) {
+                    Surface(
+                        color = Color(0xFF141D30),
+                        border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFFFD700).copy(alpha = 0.35f)),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                val idx = allMessages.indexOfFirst { it.id == pinnedMessage.id }
+                                if (idx >= 0) {
+                                    coroutineScope.launch {
+                                        listState.animateScrollToItem(idx)
+                                        highlightedMessageId = pinnedMessage.id
+                                        delay(2500)
+                                        highlightedMessageId = null
+                                    }
+                                }
+                            }
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 12.dp, vertical = 7.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Icon(
+                                    Icons.Default.PushPin,
+                                    contentDescription = "رسالة مثبتة",
+                                    tint = Color(0xFFFFD700),
+                                    modifier = Modifier.size(15.dp)
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Column {
+                                    Text(
+                                        text = "رسالة مثبتة • ${pinnedMessage.senderName}",
+                                        fontSize = 10.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = Color(0xFFFFD700)
+                                    )
+                                    Text(
+                                        text = pinnedMessage.text ?: if (!pinnedMessage.imageUrl.isNullOrBlank()) "📷 صورة مرفقة" else "مرفق",
+                                        fontSize = 11.sp,
+                                        color = Color(0xFFE2E8F0),
+                                        maxLines = 1
+                                    )
+                                }
+                            }
+
+                            if (isLeaderOrMod) {
+                                IconButton(
+                                    onClick = { togglePin(pinnedMessage) },
+                                    modifier = Modifier.size(24.dp)
+                                ) {
+                                    Icon(Icons.Default.Close, contentDescription = "إلغاء التثبيت", tint = Color(0xFF94A3B8), modifier = Modifier.size(14.dp))
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -544,18 +797,18 @@ fun AndroidGroupChatScreen(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Row(
-                    modifier = Modifier.padding(8.dp),
+                    modifier = Modifier.padding(6.dp),
                     horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(Icons.Default.WifiOff, contentDescription = null, tint = Color(0xFFEF4444), modifier = Modifier.size(16.dp))
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text("لا يوجد اتصال بالإنترنت.", color = Color(0xFFFCA5A5), fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                    Icon(Icons.Default.WifiOff, contentDescription = null, tint = Color(0xFFEF4444), modifier = Modifier.size(14.dp))
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text("لا يوجد اتصال بالإنترنت.", color = Color(0xFFFCA5A5), fontSize = 11.sp, fontWeight = FontWeight.Bold)
                 }
             }
         }
 
-        // In-App Alert Banner
+        // Alert Banner
         alertBanner?.let { bannerMsg ->
             Surface(
                 color = Color(0x33EF4444),
@@ -564,29 +817,29 @@ fun AndroidGroupChatScreen(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 12.dp, vertical = 8.dp),
+                        .padding(horizontal = 12.dp, vertical = 6.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
                         text = bannerMsg,
                         color = Color(0xFFFCA5A5),
-                        fontSize = 12.sp,
+                        fontSize = 11.sp,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.weight(1f)
                     )
                     IconButton(
                         onClick = { alertBanner = null },
-                        modifier = Modifier.size(24.dp)
+                        modifier = Modifier.size(22.dp)
                     ) {
-                        Icon(Icons.Default.Close, contentDescription = "إغلاق", tint = Color.White, modifier = Modifier.size(16.dp))
+                        Icon(Icons.Default.Close, contentDescription = "إغلاق", tint = Color.White, modifier = Modifier.size(14.dp))
                     }
                 }
             }
         }
 
-        // Messages list
-        if (messages.isEmpty()) {
+        // Messages List View
+        if (displayedMessages.isEmpty()) {
             Box(
                 modifier = Modifier
                     .weight(1f)
@@ -594,10 +847,19 @@ fun AndroidGroupChatScreen(
                 contentAlignment = Alignment.Center
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("💬", fontSize = 28.sp)
-                    Spacer(modifier = Modifier.height(6.dp))
-                    Text("لا توجد رسائل بعد", color = Color.LightGray, fontWeight = FontWeight.Bold, fontSize = 14.sp)
-                    Text("كن أول من يبدأ المحادثة في مجموعة دفعة الرحلة إلى 3000$!", color = Color.Gray, fontSize = 12.sp)
+                    Text("💬", fontSize = 32.sp)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = if (searchQuery.isNotBlank()) "لم يتم العثور على رسائل مطابقة للبحث" else "لا توجد رسائل بعد",
+                        color = Color.LightGray,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 14.sp
+                    )
+                    Text(
+                        text = if (searchQuery.isNotBlank()) "جرب البحث بكلمات أخرى" else "كن أول من يبدأ المحادثة في مجتمع Sami الفاخر!",
+                        color = Color.Gray,
+                        fontSize = 12.sp
+                    )
                 }
             }
         } else {
@@ -606,51 +868,184 @@ fun AndroidGroupChatScreen(
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
-                verticalArrangement = Arrangement.spacedBy(10.dp)
+                    .padding(horizontal = 12.dp, vertical = 6.dp),
+                verticalArrangement = Arrangement.spacedBy(6.dp)
             ) {
-                items(messages, key = { it.id }) { msg ->
+                // Pagination Trigger (Load Older Messages)
+                if (allMessages.size >= messageLimit) {
+                    item(key = "load_older_trigger") {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 6.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Button(
+                                onClick = { messageLimit += 35 },
+                                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF141D30)),
+                                border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFFFD700).copy(alpha = 0.4f)),
+                                shape = RoundedCornerShape(20.dp),
+                                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 6.dp)
+                            ) {
+                                Icon(Icons.Default.History, contentDescription = null, tint = Color(0xFFFFD700), modifier = Modifier.size(14.dp))
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Text("تحميل الرسائل السابقة...", fontSize = 11.sp, color = Color(0xFFFFD700), fontWeight = FontWeight.Bold)
+                            }
+                        }
+                    }
+                }
+
+                items(displayedMessages, key = { it.id }) { msg ->
                     val isMe = msg.senderId == currentUser.id
+                    val isHighlighted = msg.id == highlightedMessageId
+                    val isLeaderMsg = msg.senderId == 1
+
+                    // Tailored modern bubble radii for luxury look
+                    val bubbleShape = if (isMe) {
+                        RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp, bottomStart = 16.dp, bottomEnd = 4.dp)
+                    } else {
+                        RoundedCornerShape(topStart = 4.dp, topEnd = 16.dp, bottomStart = 16.dp, bottomEnd = 16.dp)
+                    }
+
+                    // Background color styling
+                    val bubbleBg = when {
+                        isHighlighted -> Color(0xFF2E2412)
+                        isMe -> Color(0xFF152238)
+                        isLeaderMsg -> Color(0xFF141C2C)
+                        else -> Color(0xFF0F172A)
+                    }
+
+                    val bubbleBorder = when {
+                        isHighlighted -> androidx.compose.foundation.BorderStroke(2.dp, Color(0xFFFFD700))
+                        isMe -> androidx.compose.foundation.BorderStroke(1.dp, Color(0x66FFD700))
+                        isLeaderMsg -> androidx.compose.foundation.BorderStroke(1.dp, Color(0x99FFD700))
+                        else -> androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF1E293B))
+                    }
+
                     Column(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 2.dp),
                         horizontalAlignment = if (isMe) Alignment.Start else Alignment.End
                     ) {
                         Surface(
-                            shape = RoundedCornerShape(16.dp),
-                            color = if (isMe) Color(0x33FFD700) else Color(0xFF131D30),
-                            border = if (isMe) androidx.compose.foundation.BorderStroke(1.dp, Color(0x88FFD700)) else null,
-                            modifier = Modifier.widthIn(max = 290.dp)
+                            shape = bubbleShape,
+                            color = bubbleBg,
+                            border = bubbleBorder,
+                            shadowElevation = 3.dp,
+                            modifier = Modifier
+                                .widthIn(min = 120.dp, max = 310.dp)
+                                .pointerInput(Unit) {
+                                    detectTapGestures(
+                                        onLongPress = {
+                                            selectedMessageForMenu = msg
+                                        },
+                                        onTap = {
+                                            // Quick reply on tap
+                                            activeReplyTo = AndroidChatReplyInfo(
+                                                id = msg.id,
+                                                senderName = msg.senderName,
+                                                text = msg.text ?: if (!msg.imageUrl.isNullOrBlank()) "📷 صورة" else "رسالة"
+                                            )
+                                        }
+                                    )
+                                }
                         ) {
-                            Column(modifier = Modifier.padding(12.dp)) {
+                            Column(modifier = Modifier.padding(10.dp)) {
+                                // Sender name & timestamp header
                                 Row(
                                     verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.SpaceBetween
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    modifier = Modifier.fillMaxWidth()
                                 ) {
-                                    Text(
-                                        text = if (isMe) "${msg.senderName} (أنت)" else msg.senderName,
-                                        fontSize = 11.sp,
-                                        fontWeight = FontWeight.Black,
-                                        color = getUserNameColor(msg.senderId)
-                                    )
-                                    Spacer(modifier = Modifier.width(12.dp))
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Text(
+                                            text = if (isMe) "${msg.senderName} (أنت)" else msg.senderName,
+                                            fontSize = 11.sp,
+                                            fontWeight = FontWeight.Black,
+                                            color = if (isLeaderMsg) Color(0xFFFFD700) else getUserNameColor(msg.senderId)
+                                        )
+                                        if (msg.isPinned) {
+                                            Spacer(modifier = Modifier.width(4.dp))
+                                            Icon(
+                                                Icons.Default.PushPin,
+                                                contentDescription = "مثبتة",
+                                                tint = Color(0xFFFFD700),
+                                                modifier = Modifier.size(11.dp)
+                                            )
+                                        }
+                                    }
+
+                                    Spacer(modifier = Modifier.width(8.dp))
                                     val timeFormat = SimpleDateFormat("hh:mm a", Locale.getDefault())
                                     Text(
                                         text = timeFormat.format(Date(msg.timestamp)),
-                                        fontSize = 10.sp,
-                                        color = Color.Gray
+                                        fontSize = 9.5.sp,
+                                        color = Color(0xFF64748B)
                                     )
                                 }
 
+                                // Quoted Reply Block if any
+                                msg.replyTo?.let { reply ->
+                                    Spacer(modifier = Modifier.height(4.dp))
+                                    Surface(
+                                        color = Color(0xFF070B14),
+                                        shape = RoundedCornerShape(8.dp),
+                                        border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF1E293B)),
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .clickable {
+                                                val targetIdx = allMessages.indexOfFirst { it.id == reply.id }
+                                                if (targetIdx >= 0) {
+                                                    coroutineScope.launch {
+                                                        listState.animateScrollToItem(targetIdx)
+                                                        highlightedMessageId = reply.id
+                                                        delay(2000)
+                                                        highlightedMessageId = null
+                                                    }
+                                                }
+                                            }
+                                    ) {
+                                        Row(
+                                            modifier = Modifier.padding(6.dp),
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Box(
+                                                modifier = Modifier
+                                                    .width(3.dp)
+                                                    .height(28.dp)
+                                                    .background(Color(0xFFFFD700))
+                                            )
+                                            Spacer(modifier = Modifier.width(6.dp))
+                                            Column {
+                                                Text(
+                                                    text = "↩️ ${reply.senderName}",
+                                                    color = Color(0xFFFFD700),
+                                                    fontSize = 10.sp,
+                                                    fontWeight = FontWeight.Bold
+                                                )
+                                                Text(
+                                                    text = reply.text ?: "مرفق",
+                                                    color = Color(0xFFCBD5E1),
+                                                    fontSize = 10.sp,
+                                                    maxLines = 1
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
+
+                                // Attached Image if any
                                 val attachedImageUrl = msg.imageUrl
                                 if (!attachedImageUrl.isNullOrBlank()) {
-                                    Spacer(modifier = Modifier.height(8.dp))
+                                    Spacer(modifier = Modifier.height(6.dp))
                                     Box(
                                         modifier = Modifier
                                             .fillMaxWidth()
-                                            .heightIn(min = 140.dp, max = 260.dp)
-                                            .clip(RoundedCornerShape(12.dp))
-                                            .background(Color(0xFF0A0F1A))
-                                            .border(1.dp, Color(0xFF1E293B), RoundedCornerShape(12.dp))
+                                            .heightIn(min = 120.dp, max = 240.dp)
+                                            .clip(RoundedCornerShape(10.dp))
+                                            .background(Color(0xFF070A10))
+                                            .border(1.dp, Color(0xFF1E293B), RoundedCornerShape(10.dp))
                                             .clickable { previewFullImageUrl = attachedImageUrl },
                                         contentAlignment = Alignment.Center
                                     ) {
@@ -659,12 +1054,12 @@ fun AndroidGroupChatScreen(
                                             contentDescription = "مرفق الدردشة",
                                             modifier = Modifier
                                                 .fillMaxWidth()
-                                                .heightIn(min = 140.dp, max = 260.dp),
+                                                .heightIn(min = 120.dp, max = 240.dp),
                                             contentScale = ContentScale.Fit
                                         )
                                         Surface(
                                             color = Color.Black.copy(alpha = 0.6f),
-                                            shape = RoundedCornerShape(8.dp),
+                                            shape = RoundedCornerShape(6.dp),
                                             modifier = Modifier
                                                 .align(Alignment.BottomEnd)
                                                 .padding(6.dp)
@@ -674,17 +1069,79 @@ fun AndroidGroupChatScreen(
                                                 contentDescription = "تكبير الصورة",
                                                 tint = Color.White,
                                                 modifier = Modifier
-                                                    .padding(4.dp)
-                                                    .size(16.dp)
+                                                    .padding(3.dp)
+                                                    .size(15.dp)
                                             )
                                         }
                                     }
                                 }
 
+                                // Message Text
                                 val messageText = msg.text
                                 if (!messageText.isNullOrBlank()) {
-                                    Spacer(modifier = Modifier.height(6.dp))
-                                    Text(text = messageText, color = Color.White, fontSize = 13.sp)
+                                    Spacer(modifier = Modifier.height(5.dp))
+                                    Text(
+                                        text = messageText,
+                                        color = Color(0xFFF1F5F9),
+                                        fontSize = 13.sp,
+                                        lineHeight = 18.sp
+                                    )
+                                }
+
+                                // Delivery checkmark for self messages
+                                if (isMe) {
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(top = 2.dp),
+                                        horizontalArrangement = Arrangement.End
+                                    ) {
+                                        Text(
+                                            text = "✓✓",
+                                            fontSize = 9.sp,
+                                            fontWeight = FontWeight.Black,
+                                            color = Color(0xFFFFD700)
+                                        )
+                                    }
+                                }
+                            }
+                        }
+
+                        // Reaction Badges Pill Row
+                        if (msg.reactions.isNotEmpty()) {
+                            Spacer(modifier = Modifier.height(3.dp))
+                            Row(
+                                modifier = Modifier
+                                    .padding(horizontal = 4.dp)
+                                    .clickable { reactionsDetailsForMessage = msg },
+                                horizontalArrangement = Arrangement.spacedBy(4.dp)
+                            ) {
+                                for ((emoji, uids) in msg.reactions) {
+                                    if (uids.isNotEmpty()) {
+                                        val hasReacted = uids.contains(currentUser.id)
+                                        Surface(
+                                            shape = RoundedCornerShape(50),
+                                            color = if (hasReacted) Color(0x44FFD700) else Color(0xFF141D30),
+                                            border = if (hasReacted) androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFFFD700)) else androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF334155)),
+                                            modifier = Modifier.clickable {
+                                                toggleReaction(msg, emoji)
+                                            }
+                                        ) {
+                                            Row(
+                                                modifier = Modifier.padding(horizontal = 7.dp, vertical = 2.dp),
+                                                verticalAlignment = Alignment.CenterVertically
+                                            ) {
+                                                Text(text = emoji, fontSize = 11.sp)
+                                                Spacer(modifier = Modifier.width(3.dp))
+                                                Text(
+                                                    text = uids.size.toString(),
+                                                    fontSize = 10.sp,
+                                                    fontWeight = FontWeight.Bold,
+                                                    color = if (hasReacted) Color(0xFFFFD700) else Color(0xFFCBD5E1)
+                                                )
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -693,7 +1150,58 @@ fun AndroidGroupChatScreen(
             }
         }
 
-        // Selected Image Preview Banner before sending
+        // Active Reply Preview Bar
+        activeReplyTo?.let { reply ->
+            Surface(
+                color = Color(0xFF121B2B),
+                border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFFFD700).copy(alpha = 0.3f)),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 12.dp, vertical = 6.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .width(3.dp)
+                                .height(26.dp)
+                                .background(Color(0xFFFFD700))
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Column {
+                            Text(
+                                text = "الرد على: ${reply.senderName}",
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color(0xFFFFD700)
+                            )
+                            Text(
+                                text = reply.text ?: "مرفق",
+                                fontSize = 11.sp,
+                                color = Color(0xFFCBD5E1),
+                                maxLines = 1
+                            )
+                        }
+                    }
+
+                    IconButton(
+                        onClick = { activeReplyTo = null },
+                        modifier = Modifier.size(26.dp)
+                    ) {
+                        Icon(Icons.Default.Close, contentDescription = "إلغاء الرد", tint = Color(0xFF94A3B8), modifier = Modifier.size(16.dp))
+                    }
+                }
+            }
+        }
+
+        // Selected Image Preview Banner
         if (selectedImageUri != null) {
             Surface(
                 color = Color(0xFF121C2E),
@@ -726,9 +1234,10 @@ fun AndroidGroupChatScreen(
             }
         }
 
-        // Input Bar with Gallery, Camera, Text Field, and Send
+        // Modern Messenger Composer Bar
         Surface(
             color = Color(0xFF0D131F),
+            shadowElevation = 8.dp,
             modifier = Modifier.fillMaxWidth()
         ) {
             Row(
@@ -742,10 +1251,10 @@ fun AndroidGroupChatScreen(
                     enabled = isOnline && !isSending,
                     onClick = { galleryLauncher.launch("image/*") }
                 ) {
-                    Icon(Icons.Default.Image, contentDescription = "إرسال صورة من المعرض", tint = Color(0xFFFFD700))
+                    Icon(Icons.Default.Image, contentDescription = "معرض الصور", tint = Color(0xFFFFD700))
                 }
 
-                // Camera Capture Button
+                // Camera Button
                 IconButton(
                     enabled = isOnline && !isSending,
                     onClick = {
@@ -762,7 +1271,7 @@ fun AndroidGroupChatScreen(
                         }
                     }
                 ) {
-                    Icon(Icons.Default.PhotoCamera, contentDescription = "التقاط صورة بالكاميرا", tint = Color(0xFFFFD700))
+                    Icon(Icons.Default.PhotoCamera, contentDescription = "التقاط صورة", tint = Color(0xFFFFD700))
                 }
 
                 OutlinedTextField(
@@ -771,7 +1280,8 @@ fun AndroidGroupChatScreen(
                     placeholder = {
                         Text(
                             if (isOnline) "اكتب رسالتك للمجموعة..." else "لا يوجد اتصال بالإنترنت.",
-                            fontSize = 12.sp
+                            fontSize = 12.sp,
+                            color = Color(0xFF64748B)
                         )
                     },
                     enabled = isOnline && !isSending,
@@ -785,7 +1295,7 @@ fun AndroidGroupChatScreen(
                     modifier = Modifier.weight(1f)
                 )
 
-                Spacer(modifier = Modifier.width(8.dp))
+                Spacer(modifier = Modifier.width(6.dp))
 
                 IconButton(
                     enabled = isOnline && !isSending && (inputText.isNotBlank() || selectedImageUri != null),
@@ -800,6 +1310,8 @@ fun AndroidGroupChatScreen(
 
                         isSending = true
                         alertBanner = null
+                        val replyCapture = activeReplyTo
+
                         coroutineScope.launch {
                             try {
                                 val now = System.currentTimeMillis()
@@ -822,11 +1334,20 @@ fun AndroidGroupChatScreen(
                                     "id" to msgId,
                                     "senderId" to currentUser.id,
                                     "senderName" to currentUser.displayName,
-                                    "timestamp" to now
+                                    "timestamp" to now,
+                                    "reactions" to emptyMap<String, List<Int>>(),
+                                    "isPinned" to false
                                 )
                                 if (textToSend.isNotEmpty()) payload["text"] = textToSend
                                 if (cloudImageUrl != null) payload["imageUrl"] = cloudImageUrl
                                 if (storagePath != null) payload["storagePath"] = storagePath
+                                if (replyCapture != null) {
+                                    payload["replyTo"] = mapOf(
+                                        "id" to replyCapture.id,
+                                        "senderName" to replyCapture.senderName,
+                                        "text" to (replyCapture.text ?: "")
+                                    )
+                                }
 
                                 FirebaseCloudHelper.getFirestore(context)
                                     .collection("chat_messages")
@@ -836,6 +1357,7 @@ fun AndroidGroupChatScreen(
 
                                 inputText = ""
                                 selectedImageUri = null
+                                activeReplyTo = null
                             } catch (e: Exception) {
                                 alertBanner = "تعذر إرسال الرسالة، يرجى التحقق من اتصال الإنترنت."
                             } finally {
@@ -859,7 +1381,168 @@ fun AndroidGroupChatScreen(
         }
     }
 
-    // Fullscreen Image Preview Modal with Pinch-to-Zoom, Pan, Zoom Controls, and Save to Gallery
+    // Floating Context & Reaction Bar Dialog
+    selectedMessageForMenu?.let { targetMsg ->
+        Dialog(
+            onDismissRequest = { selectedMessageForMenu = null },
+            properties = DialogProperties(usePlatformDefaultWidth = false)
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.5f))
+                    .clickable { selectedMessageForMenu = null },
+                contentAlignment = Alignment.Center
+            ) {
+                Surface(
+                    color = Color(0xFF141D30),
+                    shape = RoundedCornerShape(20.dp),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFFFD700).copy(alpha = 0.5f)),
+                    modifier = Modifier
+                        .padding(24.dp)
+                        .widthIn(max = 320.dp)
+                        .clickable(enabled = false) {}
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = "تفاعل مع رسالة ${targetMsg.senderName}",
+                            color = Color(0xFFFFD700),
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        // 6 Emoji Reactions Bar
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            for (emoji in SAMI_EMOJI_REACTIONS) {
+                                val hasReacted = targetMsg.reactions[emoji]?.contains(currentUser.id) == true
+                                Surface(
+                                    shape = CircleShape,
+                                    color = if (hasReacted) Color(0x44FFD700) else Color(0xFF0A0E17),
+                                    border = if (hasReacted) androidx.compose.foundation.BorderStroke(1.5.dp, Color(0xFFFFD700)) else null,
+                                    modifier = Modifier
+                                        .size(40.dp)
+                                        .clickable {
+                                            toggleReaction(targetMsg, emoji)
+                                            selectedMessageForMenu = null
+                                        }
+                                ) {
+                                    Box(contentAlignment = Alignment.Center) {
+                                        Text(emoji, fontSize = 20.sp)
+                                    }
+                                }
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(14.dp))
+                        Divider(color = Color(0xFF1E293B))
+                        Spacer(modifier = Modifier.height(10.dp))
+
+                        // Actions: Reply
+                        TextButton(
+                            onClick = {
+                                activeReplyTo = AndroidChatReplyInfo(
+                                    id = targetMsg.id,
+                                    senderName = targetMsg.senderName,
+                                    text = targetMsg.text ?: if (!targetMsg.imageUrl.isNullOrBlank()) "📷 صورة" else "رسالة"
+                                )
+                                selectedMessageForMenu = null
+                            },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Icon(Icons.Default.Reply, contentDescription = null, tint = Color(0xFFFFD700), modifier = Modifier.size(16.dp))
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text("الرد على هذه الرسالة", color = Color.White, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                        }
+
+                        // Pin/Unpin action (for leader/moderator)
+                        if (isLeaderOrMod) {
+                            TextButton(
+                                onClick = {
+                                    togglePin(targetMsg)
+                                    selectedMessageForMenu = null
+                                },
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Icon(Icons.Default.PushPin, contentDescription = null, tint = Color(0xFFFFD700), modifier = Modifier.size(16.dp))
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    text = if (targetMsg.isPinned) "إلغاء تثبيت الرسالة" else "تثبيت الرسالة في الأعلى",
+                                    color = Color(0xFFFFD700),
+                                    fontSize = 13.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                        }
+
+                        // Copy Text
+                        if (!targetMsg.text.isNullOrBlank()) {
+                            TextButton(
+                                onClick = {
+                                    val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as? android.content.ClipboardManager
+                                    val clip = android.content.ClipData.newPlainText("Sami Msg", targetMsg.text)
+                                    clipboard?.setPrimaryClip(clip)
+                                    Toast.makeText(context, "تم نسخ النص", Toast.LENGTH_SHORT).show()
+                                    selectedMessageForMenu = null
+                                },
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Icon(Icons.Default.ContentCopy, contentDescription = null, tint = Color(0xFF38BDF8), modifier = Modifier.size(16.dp))
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text("نسخ النص", color = Color.White, fontSize = 13.sp)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // Reaction Details Dialog (shows who reacted)
+    reactionsDetailsForMessage?.let { targetMsg ->
+        Dialog(onDismissRequest = { reactionsDetailsForMessage = null }) {
+            Surface(
+                color = Color(0xFF141D30),
+                shape = RoundedCornerShape(16.dp),
+                border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFFFD700).copy(alpha = 0.4f)),
+                modifier = Modifier.padding(16.dp).widthIn(max = 280.dp)
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text("التفاعلات على الرسالة", color = Color(0xFFFFD700), fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    for ((emoji, uids) in targetMsg.reactions) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 4.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(emoji, fontSize = 16.sp)
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text("${uids.size} تفاعل", color = Color.White, fontSize = 12.sp)
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Button(
+                        onClick = { reactionsDetailsForMessage = null },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1E293B)),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("إغلاق", color = Color.White, fontSize = 12.sp)
+                    }
+                }
+            }
+        }
+    }
+
+    // Fullscreen Image Preview Modal
     val activePreviewUrl = previewFullImageUrl
     if (activePreviewUrl != null) {
         FullScreenImageViewerDialog(

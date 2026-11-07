@@ -1,6 +1,15 @@
 import React, { useState, useEffect, useRef, useCallback } from './samiReactShim.ts';
 import JSZip from 'jszip';
 import { SamiChannelMembersModal } from './samiChannelMembersModal.tsx';
+import {
+  SAMI_EMOJIS,
+  SamiEmojiBar,
+  SamiMessageReactions,
+  SamiPinButton,
+  SamiPinnedBanner,
+  toggleMessageReaction,
+  toggleMessagePin,
+} from './samiMessengerExtensions.tsx';
 
 // Storage Quota Shield: automatically handles QuotaExceededError in localStorage
 if (typeof window !== 'undefined' && window.Storage) {
@@ -3702,6 +3711,22 @@ if (typeof window !== 'undefined') {
   w.getInstalledSamiAppInfo = getInstalledSamiAppInfo;
   w.getSamiServerBaseUrl = getSamiServerBaseUrl;
   w.SamiChannelMembersModal = SamiChannelMembersModal;
+  w.SamiEmojiBar = SamiEmojiBar;
+  w.SamiMessageReactions = SamiMessageReactions;
+  w.SamiPinButton = SamiPinButton;
+  w.SamiPinnedBanner = SamiPinnedBanner;
+  w.samiToggleReaction = toggleMessageReaction;
+  w.samiTogglePin = toggleMessagePin;
+  w.SAMI_EMOJIS = SAMI_EMOJIS;
 }
 
-export { SamiChannelMembersModal };
+export {
+  SamiChannelMembersModal,
+  SamiEmojiBar,
+  SamiMessageReactions,
+  SamiPinButton,
+  SamiPinnedBanner,
+  toggleMessageReaction,
+  toggleMessagePin,
+  SAMI_EMOJIS,
+};

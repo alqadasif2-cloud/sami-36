@@ -492,3 +492,41 @@ nav,
 .sami-message-highlight {
   animation: samiMessageHighlight 2.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
+
+/* Floating Emoji Reactions Bar */
+.sami-emoji-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 0.35rem 0.5rem;
+  margin-bottom: 0.5rem;
+  border-radius: 1rem;
+  background-color: rgba(15, 23, 42, 0.95);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+}
+.sami-emoji-btn {
+  font-size: 1.25rem;
+  padding: 0.25rem;
+  border-radius: 0.5rem;
+  transition: transform 0.15s ease, background-color 0.15s ease;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.sami-emoji-btn:hover {
+  transform: scale(1.25);
+  background-color: rgba(245, 158, 11, 0.2);
+}
+.sami-pinned-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #fbbf24;
+  margin-right: 0.5rem;
+}

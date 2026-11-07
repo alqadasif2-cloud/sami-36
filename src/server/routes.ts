@@ -560,6 +560,56 @@ apiRouter.post('/private-messages', async (req: Request, res: Response) => {
   }
 });
 
+apiRouter.post('/private-messages/:messageId/reaction', async (req: Request, res: Response) => {
+  try {
+    const user = getEffectiveUser(req);
+    const { emoji, conversationId } = req.body || {};
+    if (!emoji) return res.status(400).json({ error: 'رمز التفاعل مطلوب' });
+
+    const targetConv = conversationId || '';
+    const reactions = await togglePrivateMessageReaction(targetConv, req.params.messageId, user.id, String(emoji));
+    return res.json({ success: true, reactions });
+  } catch (err: any) {
+    return res.status(500).json({ error: err?.message || 'فشل إضافة التفاعل' });
+  }
+});
+
+apiRouter.post('/private-messages/reaction', async (req: Request, res: Response) => {
+  try {
+    const user = getEffectiveUser(req);
+    const { emoji, messageId, conversationId } = req.body || {};
+    if (!emoji || !messageId) return res.status(400).json({ error: 'معرف الرسالة ورمز التفاعل مطلوبان' });
+
+    const targetConv = conversationId || '';
+    const reactions = await togglePrivateMessageReaction(targetConv, messageId, user.id, String(emoji));
+    return res.json({ success: true, reactions });
+  } catch (err: any) {
+    return res.status(500).json({ error: err?.message || 'فشل إضافة التفاعل' });
+  }
+});
+
+apiRouter.post('/private-messages/:messageId/pin', async (req: Request, res: Response) => {
+  try {
+    const { conversationId } = req.body || {};
+    const isPinned = await togglePinPrivateMessage(conversationId || '', req.params.messageId);
+    return res.json({ success: true, pinned: isPinned });
+  } catch (err: any) {
+    return res.status(500).json({ error: err?.message || 'فشل تثبيت الرسالة' });
+  }
+});
+
+apiRouter.post('/private-messages/pin', async (req: Request, res: Response) => {
+  try {
+    const { messageId, conversationId } = req.body || {};
+    if (!messageId) return res.status(400).json({ error: 'معرف الرسالة مطلوب' });
+
+    const isPinned = await togglePinPrivateMessage(conversationId || '', messageId);
+    return res.json({ success: true, pinned: isPinned });
+  } catch (err: any) {
+    return res.status(500).json({ error: err?.message || 'فشل تثبيت الرسالة' });
+  }
+});
+
 // ============================================================================
 // CHALLENGES & TRADES
 // ============================================================================

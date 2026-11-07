@@ -47,6 +47,11 @@
         "fileName": { "type": "string", "maxLength": 256, "description": "Original file name" },
         "audioUrl": { "type": "string", "maxLength": 512, "description": "Voice audio URL" },
         "audioDuration": { "type": "number", "description": "Voice audio duration in seconds" },
+        "reactions": { "type": "object", "description": "Emoji reactions map (emoji -> array of user IDs)" },
+        "isPinned": { "type": "boolean", "description": "Whether message is pinned to chat header" },
+        "replyToId": { "type": "string", "maxLength": 128, "description": "Replied-to message ID" },
+        "replyToSenderName": { "type": "string", "maxLength": 100, "description": "Replied-to sender name" },
+        "replyToText": { "type": "string", "maxLength": 500, "description": "Replied-to text snippet" },
         "timestamp": { "type": "number", "description": "Message timestamp" }
       },
       "required": ["id", "senderId", "timestamp"]
