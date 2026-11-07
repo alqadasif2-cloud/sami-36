@@ -427,9 +427,30 @@ var require_react_development = __commonJS({
       }
       function resolveDispatcher() {
         var dispatcher = ReactSharedInternals.H;
-        null === dispatcher && console.error(
-          "Invalid hook call. Hooks can only be called inside of the body of a function component. This could happen for one of the following reasons:\n1. You might have mismatching versions of React and the renderer (such as React DOM)\n2. You might be breaking the Rules of Hooks\n3. You might have more than one copy of React in the same app\nSee https://react.dev/link/invalid-hook-call for tips about how to debug and fix this problem."
-        );
+        if (!dispatcher && typeof window !== "undefined") {
+          var __sr = window.__SAMI_REACT || window.React;
+          if (__sr && __sr.__CLIENT_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE && __sr.__CLIENT_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE.H) {
+            dispatcher = __sr.__CLIENT_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE.H;
+          }
+        }
+        if (!dispatcher) {
+          return {
+            useRef: function(v) { return { current: v }; },
+            useState: function(v) { return [typeof v === "function" ? v() : v, function() {}]; },
+            useEffect: function() {},
+            useLayoutEffect: function() {},
+            useInsertionEffect: function() {},
+            useCallback: function(fn) { return fn; },
+            useMemo: function(fn) { return typeof fn === "function" ? fn() : fn; },
+            useId: function() { return "sami-fallback-id"; },
+            useTransition: function() { return [false, function(fn) { fn && fn(); }]; },
+            useContext: function() { return {}; },
+            useReducer: function(r, init) { return [init, function() {}]; },
+            useDeferredValue: function(v) { return v; },
+            useOptimistic: function(v) { return v; },
+            useSyncExternalStore: function(s, get) { return get(); }
+          };
+        }
         return dispatcher;
       }
       function releaseAsyncTransition() {
